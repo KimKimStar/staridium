@@ -101,25 +101,65 @@ function generateFallbackRanking(keyword: string, period: PeriodFilterType, plat
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80"
   ];
 
+  const PERIOD_OFFSETS: Record<string, number> = {
+    "1d": 0,
+    "1w": 2,
+    "1m": 4,
+    "3m": 6,
+    "6m": 8,
+    "1y": 1,
+    "all_time": 3
+  };
+  const pOffset = PERIOD_OFFSETS[period] ?? 0;
+
   const videos: ViralVideo[] = [];
   const baseCount = 75;
 
   for (let i = 1; i <= baseCount; i++) {
     let baseViews = 0;
-    if (period === "1d") baseViews = Math.max(350000, 1500000 - (i * 15000));
-    else if (period === "1w") baseViews = Math.max(650000, 3600000 - (i * 38000));
-    else if (period === "1m") baseViews = Math.max(1200000, 7200000 - (i * 75000));
-    else if (period === "3m") baseViews = Math.max(2200000, 12500000 - (i * 130000));
-    else if (period === "6m") baseViews = Math.max(3500000, 21000000 - (i * 220000));
-    else baseViews = Math.max(5000000, 34000000 - (i * 340000));
+    let daysAgo = 0;
+    if (period === "1d") {
+      baseViews = Math.max(350000, 1500000 - (i * 15000));
+      daysAgo = 0;
+    } else if (period === "1w") {
+      baseViews = Math.max(650000, 3600000 - (i * 38000));
+      daysAgo = ((i - 1) % 6) + 1;
+    } else if (period === "1m") {
+      baseViews = Math.max(1200000, 7200000 - (i * 75000));
+      daysAgo = ((i - 1) % 22) + 8;
+    } else if (period === "3m") {
+      baseViews = Math.max(2200000, 12500000 - (i * 130000));
+      daysAgo = ((i - 1) % 60) + 31;
+    } else if (period === "6m") {
+      baseViews = Math.max(3500000, 21000000 - (i * 220000));
+      daysAgo = ((i - 1) % 90) + 91;
+    } else {
+      baseViews = Math.max(5000000, 34000000 - (i * 340000));
+      daysAgo = Math.floor((i * 3.6) + 1);
+    }
 
     const plat = platform === "all" ? (i % 3 === 1 ? "shorts" : i % 3 === 2 ? "reels" : "tiktok") : platform;
-    const thumb = THUMB_POOL[(i - 1) % THUMB_POOL.length];
+    const thumb = THUMB_POOL[(i - 1 + pOffset) % THUMB_POOL.length];
+
+    let title = "";
+    if (period === "1d") {
+      title = i === 1 ? `🔥 [오늘 1위 실시간] ${keyword} 1티어 떡상 치트키 (24h 급상승 +480%)` : `🔥 [오늘 #${i}] ${keyword} 숏폼 실시간 알고리즘 폭발`;
+    } else if (period === "1w") {
+      title = i === 1 ? `⚡ [이번 주 1위] ${keyword} 주간 350만 돌파 성공 공식` : `⚡ [주간 #${i}] ${keyword} 7일간 가장 많이 저장된 숏폼`;
+    } else if (period === "1m") {
+      title = i === 1 ? `🚀 [월간 1위 챔피언] ${keyword} 한 달 만에 1200만 달성` : `🚀 [월간 #${i}] ${keyword} 30일 누적 알고리즘 박제작`;
+    } else if (period === "3m") {
+      title = i === 1 ? `👑 [분기 1위 스테디] ${keyword} 3개월 누적 2400만 역주행` : `👑 [분기 #${i}] ${keyword} 3개월 롱런 바이럴 공식`;
+    } else if (period === "6m") {
+      title = i === 1 ? `💎 [반기 결산 메가바이럴] ${keyword} 상반기 3800만 대한민국 휩쓴 숏폼` : `💎 [6개월 #${i}] ${keyword} 메가 떡상 레퍼런스`;
+    } else {
+      title = i === 1 ? `🏆 [역대 1위 명예의 전당] ${keyword} 누적 6000만 대한민국 레전드` : `🏆 [역대 #${i}] ${keyword} 불멸의 숏폼 알고리즘`;
+    }
 
     videos.push({
       id: `vid-${keyword}-${period}-${i}`,
       rank: i,
-      title: i === 1 ? `${keyword} 고수들이 절대 안 알려주는 1티어 치트키` : `[#${i}] ${keyword} 숏폼 조회수 폭발 성공 공식`,
+      title: title,
       platform: plat,
       videoUrl: plat === "shorts" ? "https://www.youtube.com/shorts/kJQP7kiw5Fk" : "https://www.instagram.com/reels/CkJQP7kiw5Fk101/",
       thumbnail: thumb,
@@ -128,7 +168,7 @@ function generateFallbackRanking(keyword: string, period: PeriodFilterType, plat
       likesFormatted: `${(baseViews * 0.05 / 10000).toFixed(1)}만`,
       duration: `${30 + (i % 30)}s`,
       author: `${keyword}연구소`,
-      uploadDate: new Date(Date.now() - (i * 86400000)).toISOString(),
+      uploadDate: new Date(Date.now() - (daysAgo * 86400000)).toISOString(),
       mainKeyword: keyword,
       subCategory: "인기랭킹",
       subTopicId: `sub-${(i % 3) + 1}`,
