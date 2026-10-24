@@ -2,19 +2,23 @@
   "name": "viralscope-ai",
   "version": "1.0.0",
   "private": true,
-  "description": "AI 숏폼 바이럴 분석 및 프리프로덕션 기획 대시보드 SaaS (Pre-production SaaS)",
+  "description": "AI 숏폼 바이럴 분석 및 사전 기획 자동화 SaaS (Pre-production SaaS)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "collector": "ts-node scripts/collector.ts"
   },
   "dependencies": {
     "@google/genai": "^0.1.2",
+    "@google/generative-ai": "^0.11.1",
     "@stripe/stripe-js": "^3.0.7",
+    "@supabase/supabase-js": "^2.42.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.359.0",
     "next": "^14.2.1",
+    "node-cron": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "stripe": "^14.21.0",
@@ -22,11 +26,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   }
 }

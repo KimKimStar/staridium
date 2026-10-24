@@ -1,28 +1,33 @@
 export type PlatformType = "all" | "shorts" | "reels" | "tiktok";
 
+export type PeriodFilterType = "1d" | "1w" | "1m" | "3m" | "6m" | "1y" | "all_time";
+
 export interface SubTopic {
   id: string;
   name: string;
-  description: string;
-  count: number;
+  description?: string;
+  count?: number;
 }
 
 export interface ViralVideo {
   id: string;
   title: string;
   platform: "shorts" | "reels" | "tiktok";
-  subTopicId: string;
+  videoUrl: string;
+  thumbnail: string;
   views: number;
   viewsFormatted: string;
   likesFormatted: string;
   duration: string;
   author: string;
-  authorHandle: string;
-  thumbnail: string;
-  videoUrl: string;
+  uploadDate: string;
+  mainKeyword: string;
+  subCategory: string;
+  subTopicId: string;
   viralScore: number;
   hookSummary: string;
   viralReason: string;
+  rank?: number;
 }
 
 export interface TimelineItem {
@@ -47,31 +52,32 @@ export interface CreatorActionPlan {
   aiPromptSnippet: string;
 }
 
+// [핵심 요구사항 3] Gemini API 4대 심층 분석 데이터 구조
 export interface VideoDetailAnalysis {
   videoId: string;
   videoTitle: string;
   platform: "shorts" | "reels" | "tiktok";
-  // ① 초반 3초 훅 대사 및 시각적 연출법
+  // ① 초반 3초 훅(Hook) 텍스트 및 대사 추출
   hookAnalysis: {
     hookScript: string;
     visualAction: string;
     psychologicalTrigger: string;
   };
-  // ② 해당 영상의 성공 요인 및 트렌드 특징
+  // ② 해당 영상의 핵심 성공 요인 및 트렌드 특징 (조회수가 폭발한 진짜 이유!)
   successFactors: {
     title: string;
     description: string;
   }[];
-  // ③ 컷 전환 속도 및 영상 편집 방식
+  // ③ 컷 전환 템포 및 시각적 편집 스타일 분석
   editingAnalysis: {
     cutSpeed: string;
     editingStyle: string;
     soundMood: string;
     captionStyle: string;
   };
-  // ④ 전체 타임라인별 대사 (스크립트)
+  // ④ 전체 영상의 타임라인별 대본 (스크립트)
   timelineScript: TimelineItem[];
-  // ⑤ [요구사항 5] 크리에이터의 고민을 종결짓는 AI 맞춤형 떡상 기획 & 편집 액션플랜
+  // ⑤ 크리에이터를 위한 맞춤형 떡상 기획안 3선
   actionPlan: CreatorActionPlan;
 }
 
@@ -79,10 +85,11 @@ export interface SearchAnalysisResult {
   keyword: string;
   subTopics: SubTopic[];
   videos: ViralVideo[];
-  totalSearched: number;
-  insights: {
-    avgViewCount: string;
-    topPlatform: string;
-    hookPattern: string;
-  };
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  credits: number;
+  subscriptionStatus: "free" | "pro" | "canceled";
 }

@@ -1,75 +1,48 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Sparkles, Bot, Film } from "lucide-react";
+import React from "react";
 
-export const SkeletonLoader: React.FC = () => {
-  const steps = [
-    "유튜브 쇼츠 · 인스타 릴스 · 틱톡 알고리즘 전수 스캔 중...",
-    "초반 3초 후킹 공식 및 시청 지속시간 이탈 방지 장치 분석 중...",
-    "컷 전환 속도, 폰트 스타일, 배경음악(BGM) 템포 해부 중...",
-    "크리에이터 맞춤형 떡상 기획안 및 AI 대본 프롬프트 구성 중...",
-  ];
-
-  const [currentStep, setCurrentStep] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentStep((prev) => (prev + 1) % steps.length);
-    }, 1200);
-    return () => clearInterval(interval);
-  }, []);
-
+export function SkeletonLoader() {
   return (
-    <div className="w-full space-y-8 my-8">
-      {/* Real-time AI Progress Bar */}
-      <div className="max-w-xl mx-auto p-4 rounded-2xl bg-surface/90 border border-primary-500/30 shadow-xl shadow-primary-500/10 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Bot className="w-5 h-5 text-accent-cyan animate-bounce" />
-          <span className="text-sm font-semibold text-white">Gemini AI가 떡상 영상을 해부하고 있습니다</span>
+    <div className="w-full flex flex-col gap-6">
+      {/* Skeleton Pulse Banner */}
+      <div className="w-full p-4 rounded-2xl bg-surface/50 border border-primary-500/20 flex items-center justify-between animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary-600/30" />
+          <div className="flex flex-col gap-1.5">
+            <div className="w-48 h-4 rounded bg-white/10" />
+            <div className="w-32 h-3 rounded bg-white/5" />
+          </div>
         </div>
-        <p className="text-xs text-primary-300 font-mono transition-all duration-300">
-          {steps[currentStep]}
-        </p>
-
-        {/* Progress line */}
-        <div className="w-full bg-surface-border rounded-full h-1.5 mt-3 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary-600 via-accent-cyan to-accent-pink h-1.5 rounded-full animate-shimmer" />
-        </div>
+        <div className="w-24 h-6 rounded-full bg-primary-500/20" />
       </div>
 
-      {/* Grid of Skeleton Video Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
+      {/* Grid of Skeleton Cards */}
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl bg-surface/60 border border-surface-border p-4 space-y-4 animate-pulse relative overflow-hidden"
+            className="flex flex-col rounded-2xl bg-surface border border-surface-border overflow-hidden animate-pulse"
           >
-            {/* Thumbnail skeleton */}
-            <div className="w-full aspect-[9/14] bg-white/5 rounded-xl flex items-center justify-center">
-              <Film className="w-10 h-10 text-white/10" />
+            {/* Thumbnail aspect ratio */}
+            <div className="w-full aspect-[9/13] bg-white/5 relative">
+              <div className="absolute top-3 left-3 w-7 h-7 rounded-lg bg-white/10" />
+              <div className="absolute top-3 right-3 w-16 h-6 rounded-lg bg-white/10" />
             </div>
 
-            {/* Badges skeleton */}
-            <div className="flex items-center gap-2">
-              <div className="w-16 h-5 bg-white/10 rounded-md" />
-              <div className="w-20 h-5 bg-white/10 rounded-md" />
+            {/* Meta */}
+            <div className="p-4 flex flex-col gap-3">
+              <div className="flex justify-between items-center">
+                <div className="w-20 h-3 rounded bg-white/10" />
+                <div className="w-16 h-3 rounded bg-white/10" />
+              </div>
+              <div className="w-full h-4 rounded bg-white/10" />
+              <div className="w-3/4 h-4 rounded bg-white/10" />
+              <div className="w-full h-12 rounded-lg bg-white/5 mt-2" />
             </div>
-
-            {/* Title skeleton */}
-            <div className="space-y-2">
-              <div className="w-full h-4 bg-white/10 rounded" />
-              <div className="w-3/4 h-4 bg-white/10 rounded" />
-            </div>
-
-            {/* Hook text preview skeleton */}
-            <div className="w-full h-12 bg-white/5 rounded-lg border border-white/5 p-2" />
-
-            {/* Button skeleton */}
-            <div className="w-full h-9 bg-primary-600/20 rounded-xl" />
           </div>
         ))}
       </div>
     </div>
   );
-};
+}

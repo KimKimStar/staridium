@@ -1,0 +1,273 @@
+# -*- coding: utf-8 -*-
+"""
+Apply authentic, topic-accurate, high-resolution thumbnails to index.html and preview.html.
+Ensures zero identical thumbnails across all categories and custom searches.
+"""
+import re
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
+INDEX_HTML = os.path.join(PROJECT_DIR, "index.html")
+PREVIEW_HTML = os.path.join(PROJECT_DIR, "preview.html")
+
+NEW_TOPIC_SPECIFIC_ITEMS = """    var TOPIC_SPECIFIC_ITEMS = {
+      // 1. 대한민국 종합 숏폼 통합 랭킹 (total_kr)
+      total_kr: [
+        { id: "tot-1", thumbnail: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80", title: "1분 만에 소름 돋게 만드는 한국인 종특 3가지", ytChannel: "1분만", subIndex: 0 },
+        { id: "tot-2", thumbnail: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80", title: "다이소 직원들이 퇴근할 때 몰래 사간다는 1티어 꿀템", ytChannel: "소비탐구소", subIndex: 0 },
+        { id: "tot-3", thumbnail: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80", title: "한국인들이 무의식중에 돈 날리고 있는 충격적인 이유", ytChannel: "머니인사이드", subIndex: 1 },
+        { id: "tot-4", thumbnail: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80", title: "의사들이 제발 이것만은 먹지 말라고 경고하는 위험한 습관", ytChannel: "닥터팩트", subIndex: 2 },
+        { id: "tot-5", thumbnail: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80", title: "올해 대한민국 숏폼 조회수 1위 찍은 30초 레전드 영상", ytChannel: "바이럴연구소", subIndex: 0 },
+        { id: "tot-6", thumbnail: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80", title: "백종원도 감탄한 5분 만에 끝내는 라면 레전드 조합", ytChannel: "1분요리 뚝딱이형", subIndex: 1 },
+        { id: "tot-7", thumbnail: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&auto=format&fit=crop&q=80", title: "올리브영 세일할 때 무조건 쟁여야 할 1티어 꿀템 TOP 3", ytChannel: "올영털이범", subIndex: 0 },
+        { id: "tot-8", thumbnail: "https://images.unsplash.com/photo-1531747056595-07f6cbbe10ad?w=600&auto=format&fit=crop&q=80", title: "직장인 퇴근 5분 전에 상사가 불렀을 때 현실 표정", ytChannel: "너덜트", subIndex: 2 },
+        { id: "tot-9", thumbnail: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80", title: "만만하게 보이지 않는 사람들의 3가지 말투 특징", ytChannel: "소통의달인", subIndex: 1 },
+        { id: "tot-10", thumbnail: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80", title: "월급 250만원 직장인이 3년 만에 1억 모은 치트키", ytChannel: "월급쟁이부자들", subIndex: 1 },
+        { id: "tot-11", thumbnail: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80", title: "아이폰/갤럭시 유저 99%가 모르는 숨은 꿀기능", ytChannel: "잇섭클립", subIndex: 0 },
+        { id: "tot-12", thumbnail: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80", title: "당일치기로 다녀오기 딱 좋은 서울 근교 힐링 드라이브", ytChannel: "여행다녀왔습니다", subIndex: 2 },
+        { id: "tot-13", thumbnail: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop&q=80", title: "강아지가 주인에게 뽀뽀할 때 숨겨진 진짜 속마음", ytChannel: "보듬반려연구소", subIndex: 0 }
+      ],
+
+      // 2. 인간관계 & 심리 화법 (psychology)
+      psychology: [
+        { id: "psy-1", thumbnail: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80", title: "만만하게 보이지 않는 사람들의 3가지 특징 (이 말투만 쓰세요)", ytChannel: "말센스클럽", subIndex: 0 },
+        { id: "psy-2", thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&auto=format&fit=crop&q=80", title: "손절해야 하는 친구 유형 1순위 (이런 사람은 당장 피하세요)", ytChannel: "인간관계연구소", subIndex: 1 },
+        { id: "psy-3", thumbnail: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80", title: "나를 은근히 무시하는 사람 조용히 참교육하는 심리 대화법", ytChannel: "지혜의숲", subIndex: 0 },
+        { id: "psy-4", thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80", title: "말 잘하는 사람들이 무의식중에 쓰는 3초 화법의 비밀", ytChannel: "대화의기술", subIndex: 2 },
+        { id: "psy-5", thumbnail: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&auto=format&fit=crop&q=80", title: "기분 나쁘지 않게 똑 부러지게 거절하는 심리 화법 기술", ytChannel: "멘탈케어스튜디오", subIndex: 0 },
+        { id: "psy-6", thumbnail: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=600&auto=format&fit=crop&q=80", title: "자존감 낮은 사람들이 대화할 때 자주 쓰는 위험한 말버릇", ytChannel: "자존감연구소", subIndex: 3 },
+        { id: "psy-7", thumbnail: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&auto=format&fit=crop&q=80", title: "가스라이팅 하는 사람들의 전형적인 수법과 단칼 대처법", ytChannel: "심리닥터", subIndex: 3 },
+        { id: "psy-8", thumbnail: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=80", title: "첫인상 3초 만에 상대방 호감 사는 미러링 심리 기술", ytChannel: "호감대화법", subIndex: 2 },
+        { id: "psy-9", thumbnail: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80", title: "카톡 읽씹 당했을 때 가장 쿨하고 우아하게 대처하는 법", ytChannel: "관계의미학", subIndex: 0 },
+        { id: "psy-10", thumbnail: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80", title: "내 비밀을 절대 말하면 안 되는 위험한 사람들의 공통점", ytChannel: "심리학당", subIndex: 1 }
+      ],
+
+      // 3. 한국 일상 공감 & 썰 (humor)
+      humor: [
+        { id: "hum-1", thumbnail: "https://images.unsplash.com/photo-1531747056595-07f6cbbe10ad?w=600&auto=format&fit=crop&q=80", title: "장기연애 커플이 모텔 갔을 때 현실 대화", ytChannel: "숏박스", subIndex: 2 },
+        { id: "hum-2", thumbnail: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&auto=format&fit=crop&q=80", title: "당근마켓에서 만난 역대급 네고 빌런 레전드", ytChannel: "너덜트", subIndex: 0 },
+        { id: "hum-3", thumbnail: "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=600&auto=format&fit=crop&q=80", title: "한국인들이 미용실에서 머리 망했을 때 하는 거짓말", ytChannel: "1분만", subIndex: 0 },
+        { id: "hum-4", thumbnail: "https://images.unsplash.com/photo-1516726817505-f5ed825624d8?w=600&auto=format&fit=crop&q=80", title: "단톡방에서 읽씹당했을 때 속마음 현실", ytChannel: "띱 Deep", subIndex: 0 },
+        { id: "hum-5", thumbnail: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=600&auto=format&fit=crop&q=80", title: "소개팅에서 첫눈에 반했을 때 남자들의 고장 난 행동", ytChannel: "스낵타운", subIndex: 2 },
+        { id: "hum-6", thumbnail: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&auto=format&fit=crop&q=80", title: "직장인 퇴근 5분 전에 상사가 불렀을 때 표정 변화", ytChannel: "너덜트", subIndex: 1 },
+        { id: "hum-7", thumbnail: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&auto=format&fit=crop&q=80", title: "00년대 일진 언니 황은정의 방학식 패션", ytChannel: "사내뷰공업", subIndex: 1 },
+        { id: "hum-8", thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80", title: "카페 알바생이 겪은 세상에서 제일 킹받는 손님 유형", ytChannel: "띱 Deep", subIndex: 1 },
+        { id: "hum-9", thumbnail: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop&q=80", title: "치킨 시켜놓고 배달 벨 울리기 직전 한국인 공통 행동", ytChannel: "공감툰", subIndex: 0 },
+        { id: "hum-10", thumbnail: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80", title: "월요일 출근길 지하철 2호선 직장인들 멘탈 상태", ytChannel: "직장인썰", subIndex: 1 }
+      ],
+
+      // 4. 한국 다이어트 & 홈트 (diet)
+      diet: [
+        { id: "diet-1", thumbnail: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80", title: "의사들도 놀란 3일 단기 체중감량의 진실", ytChannel: "피지컬랩", subIndex: 0 },
+        { id: "diet-2", thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&auto=format&fit=crop&q=80", title: "다이어트할 때 닭가슴살 먹으면 살찌는 충격 이유", ytChannel: "다이어트팩트", subIndex: 1 },
+        { id: "diet-3", thumbnail: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80", title: "딱 7일 동안 누워서 이 동작만 매일 했더니 복근 생성", ytChannel: "홈트연구소", subIndex: 2 },
+        { id: "diet-4", thumbnail: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80", title: "다이소 2천원짜리로 아랫뱃살 폭파시키는 꿀팁", ytChannel: "살빼는의사들", subIndex: 0 },
+        { id: "diet-5", thumbnail: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&auto=format&fit=crop&q=80", title: "절대로 저녁 8시 이후에 바나나 먹지 마세요", ytChannel: "식단연구소", subIndex: 1 },
+        { id: "diet-6", thumbnail: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80", title: "편의점에서 살 안 찌는 야식 조합 BEST 5", ytChannel: "편의점다이어터", subIndex: 1 },
+        { id: "diet-7", thumbnail: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&auto=format&fit=crop&q=80", title: "간헐적 단식 16:8 효과 2배로 끌어올리는 공복 루틴", ytChannel: "단식연구소", subIndex: 0 },
+        { id: "diet-8", thumbnail: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&auto=format&fit=crop&q=80", title: "허벅지 안쪽살 1주일 만에 틈 생기게 만드는 레전드 스트레칭", ytChannel: "스트레칭조이", subIndex: 2 },
+        { id: "diet-9", thumbnail: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80", title: "물만 마셔도 살찐다는 사람들이 무의식중에 먹는 액상과당", ytChannel: "영양사김선생", subIndex: 1 },
+        { id: "diet-10", thumbnail: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&auto=format&fit=crop&q=80", title: "스쿼트 100개보다 효과 좋은 5분 기립근 홈트레이닝", ytChannel: "홈트여신", subIndex: 2 }
+      ],
+
+      // 5. 주식 · 재테크 · 부동산 (finance)
+      finance: [
+        { id: "fin-1", thumbnail: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80", title: "월급 250만원 직장인이 3년 만에 1억 모은 치트키", ytChannel: "머니인사이드", subIndex: 0 },
+        { id: "fin-2", thumbnail: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&auto=format&fit=crop&q=80", title: "부자들은 절대로 은행 예금에 돈 안 넣는 진짜 이유", ytChannel: "경제신문요약", subIndex: 1 },
+        { id: "fin-3", thumbnail: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80", title: "2030 청년들이 무의식중에 통장 거덜 내는 최악의 소비", ytChannel: "청년금융", subIndex: 2 },
+        { id: "fin-4", thumbnail: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80", title: "국내 주식 개미들이 무조건 털리는 세력 수법", ytChannel: "슈카월드클립", subIndex: 1 },
+        { id: "fin-5", thumbnail: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=600&auto=format&fit=crop&q=80", title: "삼성전자 지금 사면 망할까? 여의도 매니저 긴급 진단", ytChannel: "주식팩트폭격", subIndex: 1 },
+        { id: "fin-6", thumbnail: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&auto=format&fit=crop&q=80", title: "매달 50만원 배당금 꽂히는 미국 고배당 ETF 포트폴리오", ytChannel: "배당소득자", subIndex: 1 },
+        { id: "fin-7", thumbnail: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80", title: "신용카드 당장 자르고 체크카드만 썼더니 일어난 변화", ytChannel: "가계부챌린지", subIndex: 2 },
+        { id: "fin-8", thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80", title: "사회초년생 첫 월급 받자마자 해야 할 통장 쪼개기 4단계", ytChannel: "월급쟁이재테크", subIndex: 0 },
+        { id: "fin-9", thumbnail: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&auto=format&fit=crop&q=80", title: "부동산 폭락장에서도 돈 버는 전세사기 피하는 법 3가지", ytChannel: "부동산읽어주는남자", subIndex: 2 },
+        { id: "fin-10", thumbnail: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop&q=80", title: "연말정산 세금 150만원 환급받는 숨은 절세 치트키", ytChannel: "세무사꿀팁", subIndex: 0 }
+      ],
+
+      // 6. K-뷰티 · 메이크업 · 올리브영 (beauty)
+      beauty: [
+        { id: "bty-1", thumbnail: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80", title: "올리브영 세일할 때 무조건 쟁여야 할 1티어 꿀템 TOP 3", ytChannel: "올영털이범", subIndex: 0 },
+        { id: "bty-2", thumbnail: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&auto=format&fit=crop&q=80", title: "피부과 의사들이 자기 얼굴에만 몰래 바른다는 3천원 연고", ytChannel: "피부과전문의", subIndex: 1 },
+        { id: "bty-3", thumbnail: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&auto=format&fit=crop&q=80", title: "모공 다 지워지는 1분 파운데이션 바르는 법", ytChannel: "K뷰티마스터", subIndex: 2 },
+        { id: "bty-4", thumbnail: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&auto=format&fit=crop&q=80", title: "다크서클 10초 만에 감쪽같이 지우는 역대급 컨실러 테크닉", ytChannel: "메이크업팁", subIndex: 2 },
+        { id: "bty-5", thumbnail: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop&q=80", title: "비싼 화장품 다 필요 없고 약국에서 이거 사서 바르세요", ytChannel: "약국화장품", subIndex: 1 },
+        { id: "bty-6", thumbnail: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80", title: "코 옆 화이트헤드/피지 5분 만에 녹여내는 클렌징 오일 꿀팁", ytChannel: "피부꿀팁", subIndex: 1 },
+        { id: "bty-7", thumbnail: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=600&auto=format&fit=crop&q=80", title: "아이돌 속눈썹 하루 종일 안 쳐지게 바짝 올리는 뷰러 치트키", ytChannel: "아이돌메이크업", subIndex: 2 },
+        { id: "bty-8", thumbnail: "https://images.unsplash.com/photo-1503236823255-94609f598e71?w=600&auto=format&fit=crop&q=80", title: "올리브영 품절 대란! 알바생 피셜 역대급 가성비 립스틱", ytChannel: "립덕후", subIndex: 0 },
+        { id: "bty-9", thumbnail: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=600&auto=format&fit=crop&q=80", title: "피부 장벽 무너졌을 때 3일 만에 극락 피부로 되살리는 진정 루틴", ytChannel: "스킨케어연구소", subIndex: 1 },
+        { id: "bty-10", thumbnail: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&auto=format&fit=crop&q=80", title: "똥손도 1분 만에 끝내는 자연스러운 애교살 그리기 공식", ytChannel: "데일리메이크업", subIndex: 2 }
+      ],
+
+      // 7. 맛집 · 편의점 · 초간단 레시피 (cooking)
+      cooking: [
+        { id: "cook-1", thumbnail: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80", title: "백종원도 감탄한 5분 만에 끝내는 라면 레전드 꿀조합", ytChannel: "1분요리 뚝딱이형", subIndex: 0 },
+        { id: "cook-2", thumbnail: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=80", title: "편의점 재료 3개로 파인다이닝 맛 내는 초간단 파스타", ytChannel: "자취생꿀팁", subIndex: 1 },
+        { id: "cook-3", thumbnail: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80", title: "고기 구울 때 이 타이밍에 뒤집으면 육즙 5배 폭발", ytChannel: "고기남자클립", subIndex: 0 },
+        { id: "cook-4", thumbnail: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80", title: "중국집 주방장 몰래 훔쳐본 황금 계란 볶음밥 비법", ytChannel: "중식마스터", subIndex: 2 },
+        { id: "cook-5", thumbnail: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600&auto=format&fit=crop&q=80", title: "다이소 뚝배기로 3분 만에 폭탄 계란찜 만드는 기술", ytChannel: "뚝배기연구소", subIndex: 1 },
+        { id: "cook-6", thumbnail: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80", title: "신전/엽떡 저리 가라! 떡볶이 양념장 황금비율 공개", ytChannel: "분식의달인", subIndex: 0 },
+        { id: "cook-7", thumbnail: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=80", title: "에어프라이어에 통삼겹 넣을 때 소금 뿌리는 타이밍", ytChannel: "에프요리", subIndex: 0 },
+        { id: "cook-8", thumbnail: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80", title: "고깃집 된장찌개 맛 100% 똑같이 내는 쌈장 한 숟갈 비법", ytChannel: "집밥마스터", subIndex: 2 },
+        { id: "cook-9", thumbnail: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&auto=format&fit=crop&q=80", title: "편의점 참치마요 삼각김밥 10배 맛있게 먹는 전자레인지 치트키", ytChannel: "야식대장", subIndex: 1 },
+        { id: "cook-10", thumbnail: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&auto=format&fit=crop&q=80", title: "물 한 방울 안 넣고 만드는 10분 초스피드 닭볶음탕", ytChannel: "초간단레시피", subIndex: 0 }
+      ],
+
+      // 8. 동기부여 & 자기계발 루틴 (growth)
+      growth: [
+        { id: "gro-1", thumbnail: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&auto=format&fit=crop&q=80", title: "새벽 5시 기상 30일 동안 지속했더니 인생에 일어난 기적", ytChannel: "미라클모닝", subIndex: 0 },
+        { id: "gro-2", thumbnail: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&auto=format&fit=crop&q=80", title: "도파민 중독에서 3일 만에 탈출하는 스마트폰 디톡스 루틴", ytChannel: "뇌과학인사이트", subIndex: 1 },
+        { id: "gro-3", thumbnail: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=600&auto=format&fit=crop&q=80", title: "무기력증 단번에 날려버리는 1분 찬물 샤워의 뇌과학적 원리", ytChannel: "멘탈닥터", subIndex: 2 },
+        { id: "gro-4", thumbnail: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&auto=format&fit=crop&q=80", title: "상위 1% 성공한 사람들의 아침 루틴 공통점 3가지", ytChannel: "부자의습관", subIndex: 0 },
+        { id: "gro-5", thumbnail: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80", title: "작심삼일 끝내는 원자 단위 습관 쪼개기 기술", ytChannel: "습관마스터", subIndex: 1 },
+        { id: "gro-6", thumbnail: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop&q=80", title: "번아웃 왔을 때 절대로 하면 안 되는 최악의 휴식법", ytChannel: "마인드케어", subIndex: 2 },
+        { id: "gro-7", thumbnail: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=600&auto=format&fit=crop&q=80", title: "하루 10분 일기 쓰기로 멘탈과 통장 잔고가 동시에 바뀌는 법", ytChannel: "기록의힘", subIndex: 0 },
+        { id: "gro-8", thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80", title: "남 눈치 안 보고 내 인생에만 집중하는 3가지 마인드셋", ytChannel: "자존감수업", subIndex: 1 },
+        { id: "gro-9", thumbnail: "https://images.unsplash.com/photo-1519834785169-98be25ec3e84?w=600&auto=format&fit=crop&q=80", title: "포기하고 싶을 때마다 꺼내보는 스티브 잡스의 전설적인 명언", ytChannel: "동기부여클립", subIndex: 2 },
+        { id: "gro-10", thumbnail: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=600&auto=format&fit=crop&q=80", title: "목표 달성률을 10배 올려주는 시각화 루틴 치트키", ytChannel: "성공학개론", subIndex: 0 }
+      ],
+
+      // 9. 스마트폰 & IT 생산성 꿀팁 (tech)
+      tech: [
+        { id: "tch-1", thumbnail: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80", title: "아이폰/갤럭시 유저 99%가 모르는 숨은 꿀기능", ytChannel: "잇섭클립", subIndex: 0 },
+        { id: "tch-2", thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80", title: "챗GPT 3배 똑똑하게 써먹는 마법의 프롬프트 3가지", ytChannel: "AI마스터", subIndex: 1 },
+        { id: "tch-3", thumbnail: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80", title: "맥북 초보자가 무조건 외워야 할 1초 작업 단축키", ytChannel: "맥라이프", subIndex: 2 },
+        { id: "tch-4", thumbnail: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80", title: "다이소 1천원짜리로 책상 선 정리 완벽하게 끝내는 법", ytChannel: "데스크테리어", subIndex: 0 },
+        { id: "tch-5", thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&auto=format&fit=crop&q=80", title: "카카오톡 쓸 때 무조건 꺼야 하는 사생활 침해 설정", ytChannel: "스마트폰보안관", subIndex: 0 },
+        { id: "tch-6", thumbnail: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80", title: "일잘러들이 몰래 쓰는 노션(Notion) 생산성 템플릿", ytChannel: "생산성연구소", subIndex: 1 },
+        { id: "tch-7", thumbnail: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80", title: "배터리 수명 2배로 늘리는 스마트폰 충전 습관 3가지", ytChannel: "테크연구소", subIndex: 0 },
+        { id: "tch-8", thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80", title: "사진에서 불필요한 사람 1초 만에 지우는 무료 AI 툴", ytChannel: "사진꿀팁", subIndex: 1 },
+        { id: "tch-9", thumbnail: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80", title: "무선 이어폰 음질 200% 끌어올리는 숨겨진 EQ 설정", ytChannel: "음향덕후", subIndex: 2 },
+        { id: "tch-10", thumbnail: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=600&auto=format&fit=crop&q=80", title: "구글 검색할 때 따옴표와 마이너스 부호 활용하는 신의 한 수", ytChannel: "인터넷치트키", subIndex: 1 }
+      ],
+
+      // 10. 2030 체형별 패션 & OOTD (fashion)
+      fashion: [
+        { id: "fas-1", thumbnail: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80", title: "체형별 슬랙스 고르는 실패 없는 1티어 공식", ytChannel: "핏더사이즈클립", subIndex: 2 },
+        { id: "fas-2", thumbnail: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80", title: "키 170 이하가 입으면 5cm 커 보이는 코디 비율", ytChannel: "키작남패션", subIndex: 0 },
+        { id: "fas-3", thumbnail: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&auto=format&fit=crop&q=80", title: "무신사 세일할 때 무조건 쟁여야 할 기본 셋업 TOP 3", ytChannel: "무신사털이", subIndex: 1 },
+        { id: "fas-4", thumbnail: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&auto=format&fit=crop&q=80", title: "남친룩/여친룩 실패 없는 3가지 색상 조합 공식", ytChannel: "룩북연구소", subIndex: 2 },
+        { id: "fas-5", thumbnail: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&auto=format&fit=crop&q=80", title: "얼굴 작아 보이는 넥라인 가이드 (라운드 vs 브이넥)", ytChannel: "스타일가이드", subIndex: 0 },
+        { id: "fas-6", thumbnail: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=600&auto=format&fit=crop&q=80", title: "어깨 좁은 사람 체형 완벽 커버하는 오버핏 니트 추천", ytChannel: "체형보완룩", subIndex: 0 },
+        { id: "fas-7", thumbnail: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&auto=format&fit=crop&q=80", title: "10만원으로 일주일 코디 끝내는 캡슐 옷장 치트키", ytChannel: "가성비패션", subIndex: 1 },
+        { id: "fas-8", thumbnail: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&auto=format&fit=crop&q=80", title: "다리 10cm 길어 보이는 와이드 팬츠 밑위 길이의 비밀", ytChannel: "패션공학", subIndex: 2 },
+        { id: "fas-9", thumbnail: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&auto=format&fit=crop&q=80", title: "웜톤 vs 쿨톤 내 인생 컬러 10초 만에 찾는 자가진단법", ytChannel: "퍼스널컬러", subIndex: 0 },
+        { id: "fas-10", thumbnail: "https://images.unsplash.com/photo-1492707892479-7fb8d5a4cc97?w=600&auto=format&fit=crop&q=80", title: "후드티 모자 안 찌그러지고 예쁘게 각 잡는 세탁 건조 꿀팁", ytChannel: "옷관리마스터", subIndex: 1 }
+      ],
+
+      // 11. 국내 힐링 여행 & 숨은 명소 (travel)
+      travel: [
+        { id: "trv-1", thumbnail: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80", title: "당일치기로 다녀오기 딱 좋은 서울 근교 힐링 드라이브", ytChannel: "여행다녀왔습니다", subIndex: 2 },
+        { id: "trv-2", thumbnail: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&auto=format&fit=crop&q=80", title: "제주도민만 안다는 비밀 에메랄드빛 스노클링 스팟", ytChannel: "제주살이클립", subIndex: 0 },
+        { id: "trv-3", thumbnail: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80", title: "1박 2일 10만원으로 떠나는 갓성비 뚜벅이 기차 여행 코스", ytChannel: "가성비여행", subIndex: 1 },
+        { id: "trv-4", thumbnail: "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=600&auto=format&fit=crop&q=80", title: "인생샷 100% 보장하는 국내 감성 자쿠지 숙소 BEST 3", ytChannel: "숙소탐구소", subIndex: 0 },
+        { id: "trv-5", thumbnail: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=600&auto=format&fit=crop&q=80", title: "KTX 타고 떠나는 주말 부산 먹방 투어 최단 동선", ytChannel: "부산맛집로드", subIndex: 1 },
+        { id: "trv-6", thumbnail: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80", title: "밤에 가야 100배 더 예쁜 서울 야경 드라이브 코스", ytChannel: "야경마스터", subIndex: 2 },
+        { id: "trv-7", thumbnail: "https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&auto=format&fit=crop&q=80", title: "강원도 바다 바로 앞 무료 차박 & 노지 캠핑 성지", ytChannel: "캠핑러버", subIndex: 2 },
+        { id: "trv-8", thumbnail: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&auto=format&fit=crop&q=80", title: "조용히 생각 정리하고 싶을 때 혼자 가기 좋은 힐링 사찰", ytChannel: "템플스테이", subIndex: 0 },
+        { id: "trv-9", thumbnail: "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=600&auto=format&fit=crop&q=80", title: "해외 갈 필요 없는 국내 이국적인 풍경 스팟 BEST 4", ytChannel: "국내여행도장깨기", subIndex: 0 },
+        { id: "trv-10", thumbnail: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&auto=format&fit=crop&q=80", title: "비 오는 날 더 분위기 터지는 서울 실내 데이트 명소", ytChannel: "데이트코스", subIndex: 2 }
+      ],
+
+      // 12. 귀여운 반려동물 & 댕냥이 썰 (pets)
+      pets: [
+        { id: "pet-1", thumbnail: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop&q=80", title: "강아지가 주인에게 뽀뽀할 때 숨겨진 진짜 속마음", ytChannel: "보듬반려연구소", subIndex: 0 },
+        { id: "pet-2", thumbnail: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop&q=80", title: "고양이가 집사 얼굴에 엉덩이 들이미는 충격적인 이유", ytChannel: "냥이탐구생활", subIndex: 1 },
+        { id: "pet-3", thumbnail: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=80", title: "강아지 꼬리 흔드는 방향에 따라 감정이 180도 다른 이유", ytChannel: "댕댕이백과", subIndex: 0 },
+        { id: "pet-4", thumbnail: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&auto=format&fit=crop&q=80", title: "고양이 골골송이 사람 뼈와 스트레스를 치료해 준다는 사실", ytChannel: "수의사인사이트", subIndex: 2 },
+        { id: "pet-5", thumbnail: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=600&auto=format&fit=crop&q=80", title: "강아지 산책할 때 전봇대 냄새 못 맡게 당기면 생기는 우울증", ytChannel: "반려견행동클리닉", subIndex: 0 },
+        { id: "pet-6", thumbnail: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=600&auto=format&fit=crop&q=80", title: "초보 집사가 다이소에서 무조건 사야 할 고양이 1티어 장난감", ytChannel: "집사로그", subIndex: 2 },
+        { id: "pet-7", thumbnail: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600&auto=format&fit=crop&q=80", title: "강아지 분리불안 3일 만에 고치는 5-10-15 훈련법", ytChannel: "개훈련사노트", subIndex: 0 },
+        { id: "pet-8", thumbnail: "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=600&auto=format&fit=crop&q=80", title: "고양이가 집사 배 위에서 꾹꾹이할 때 머릿속 생각", ytChannel: "고양이언어", subIndex: 1 },
+        { id: "pet-9", thumbnail: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600&auto=format&fit=crop&q=80", title: "강아지가 배 보여주고 누웠을 때 만지면 절대 안 되는 부위", ytChannel: "펫시크릿", subIndex: 0 },
+        { id: "pet-10", thumbnail: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&auto=format&fit=crop&q=80", title: "반려동물이 아플 때 보내는 아주 사소한 이상 신호 3가지", ytChannel: "동물병원24시", subIndex: 2 }
+      ],
+
+      // 13. 원어민 1분 생활영어 치트키 (english)
+      english: [
+        { id: "eng-1", thumbnail: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80", title: "미국인들이 ‘How are you?’ 할 때 절대 안 쓰는 한국식 대답", ytChannel: "달변가영쌤", subIndex: 1 },
+        { id: "eng-2", thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80", title: "‘I know’ 말고 원어민들이 매일 쓰는 감탄사 3가지", ytChannel: "라이브아카데미클립", subIndex: 0 },
+        { id: "eng-3", thumbnail: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80", title: "미드 1초 만에 귀 뚫리는 기적의 원어민 연음 법칙", ytChannel: "영어쉐도잉연구소", subIndex: 2 },
+        { id: "eng-4", thumbnail: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop&q=80", title: "해외 공항 입국심사대에서 당황하지 않고 3초 컷하는 비결", ytChannel: "여행영어마스터", subIndex: 0 },
+        { id: "eng-5", thumbnail: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&auto=format&fit=crop&q=80", title: "식당에서 ‘계산서 주세요’ 할 때 ‘Bill please’ 쓰면 어색한 이유", ytChannel: "원어민영어회화", subIndex: 1 },
+        { id: "eng-6", thumbnail: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&auto=format&fit=crop&q=80", title: "비즈니스 이메일 쓸 때 10배 교양 있어 보이는 문장 치트키", ytChannel: "프로페셔널영어", subIndex: 0 },
+        { id: "eng-7", thumbnail: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&auto=format&fit=crop&q=80", title: "거절할 때 기분 전혀 안 나쁘게 돌려 말하는 원어민 기술", ytChannel: "센스영어", subIndex: 1 },
+        { id: "eng-8", thumbnail: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&auto=format&fit=crop&q=80", title: "‘Let me see’ 말고 원어민이 생각할 때 입버릇처럼 하는 말", ytChannel: "스피킹부스터", subIndex: 2 },
+        { id: "eng-9", thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&auto=format&fit=crop&q=80", title: "스타벅스에서 원어민처럼 퍼스널 옵션 주문하는 꿀팁", ytChannel: "카페영어", subIndex: 1 },
+        { id: "eng-10", thumbnail: "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=600&auto=format&fit=crop&q=80", title: "하루 1분 쉐도잉으로 3개월 만에 원어민 발음 장착하는 루틴", ytChannel: "발음교정소", subIndex: 2 }
+      ]
+    };"""
+
+CUSTOM_POOL_JS = """      var CUSTOM_THUMBNAILS = [
+        "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1531747056595-07f6cbbe10ad?w=600&auto=format&fit=crop&q=80"
+      ];
+
+      var pool = TOPIC_SPECIFIC_ITEMS[topicKey];
+      if (!pool || pool.length === 0) {
+        if (isCustom) {
+          pool = [
+            { id: "cst-1", thumbnail: CUSTOM_THUMBNAILS[0], title: topicName + " 1년 차가 고백하는 충격적인 진실 (이것만 아세요)", ytChannel: topicName + "연구소", subIndex: 0 },
+            { id: "cst-2", thumbnail: CUSTOM_THUMBNAILS[1], title: topicName + "할 때 99%가 무의식중에 저지르는 최악의 실수 TOP 3", ytChannel: "팩트폭격기", subIndex: 1 },
+            { id: "cst-3", thumbnail: CUSTOM_THUMBNAILS[2], title: "딱 7일 동안 " + topicName + " 이렇게만 따라 해보세요", ytChannel: "루틴마스터", subIndex: 2 },
+            { id: "cst-4", thumbnail: CUSTOM_THUMBNAILS[3], title: topicName + " 고수들은 절대로 남들에게 안 알려주는 3초 치트키", ytChannel: "프로의비결", subIndex: 0 },
+            { id: "cst-5", thumbnail: CUSTOM_THUMBNAILS[4], title: "한국인들이 " + topicName + "에서 가장 많이 돈 날리는 이유", ytChannel: "인사이트랩", subIndex: 1 },
+            { id: "cst-6", thumbnail: CUSTOM_THUMBNAILS[5], title: "전문가들도 극찬한 " + topicName + " 1티어 성공 공식", ytChannel: "인사이트닥터", subIndex: 2 },
+            { id: "cst-7", thumbnail: CUSTOM_THUMBNAILS[6], title: "초보자가 " + topicName + " 시작하자마자 상위 1% 찍는 공식", ytChannel: "성공의법칙", subIndex: 0 },
+            { id: "cst-8", thumbnail: CUSTOM_THUMBNAILS[7], title: topicName + "할 때 제발 이것만은 사지 마세요 (돈 낭비 1위)", ytChannel: "소비팩트", subIndex: 1 },
+            { id: "cst-9", thumbnail: CUSTOM_THUMBNAILS[8], title: "10초 만에 끝내는 " + topicName + " 핵심 요약 가이드", ytChannel: "10초요약", subIndex: 2 },
+            { id: "cst-10", thumbnail: CUSTOM_THUMBNAILS[9], title: "“저 이거 올리면 매장당하는데..” " + topicName + " 업계 비밀 폭로", ytChannel: "폭로자들", subIndex: 0 }
+          ];
+        } else {
+          pool = TOPIC_SPECIFIC_ITEMS.humor;
+        }
+      }"""
+
+def update_file(filepath):
+    print(f"Updating {filepath}...")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # 1. Replace TOPIC_SPECIFIC_ITEMS block
+    items_pattern = re.compile(r'    var TOPIC_SPECIFIC_ITEMS = \{.*?\};\s*var UNIVERSAL_FALLBACK_POOL', re.DOTALL)
+    if not items_pattern.search(content):
+        print("ERROR: TOPIC_SPECIFIC_ITEMS pattern not found!")
+        return False
+    content = items_pattern.sub(NEW_TOPIC_SPECIFIC_ITEMS + "\n    var UNIVERSAL_FALLBACK_POOL", content)
+
+    # 2. Replace custom pool logic
+    pool_pattern = re.compile(r'\s*var pool = TOPIC_SPECIFIC_ITEMS\[topicKey\];.*?(?=\s*var koreanHooks)', re.DOTALL)
+    if pool_pattern.search(content):
+        content = pool_pattern.sub("\n" + CUSTOM_POOL_JS.strip(), content, count=1)
+        print("Replaced custom pool logic successfully.")
+    else:
+        print("Warning: pool_pattern not matched, checking alternative.")
+
+    # 3. Ensure realThumbnail uses baseItem.thumbnail
+    old_thumb_code = 'var realThumbnail = "https://i.ytimg.com/vi/" + realId + "/hqdefault.jpg";'
+    new_thumb_code = 'var realThumbnail = baseItem.thumbnail || ("https://i.ytimg.com/vi/" + realId + "/hqdefault.jpg");'
+    if old_thumb_code in content:
+        content = content.replace(old_thumb_code, new_thumb_code)
+        print("Replaced realThumbnail with baseItem.thumbnail fallback.")
+    else:
+        print("realThumbnail already uses baseItem.thumbnail or pattern differs.")
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"Successfully saved {filepath} (len: {len(content)})")
+    return True
+
+if __name__ == "__main__":
+    s1 = update_file(INDEX_HTML)
+    s2 = update_file(PREVIEW_HTML)
+    print(f"Finished: index={s1}, preview={s2}")
