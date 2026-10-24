@@ -20,26 +20,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     
     def do_GET(self):
         if self.path == "/" or self.path == "":
-            self.path = "/preview.html"
+            self.path = "/index.html"
         return super().do_GET()
 
 def main():
     os.chdir(DIRECTORY)
-    url = f"http://127.0.0.1:{PORT}/preview.html"
+    url = f"http://127.0.0.1:{PORT}/index.html"
     print("=" * 65)
-    print("  [ViralScope AI] Short-form Viral Pre-production SaaS Dashboard")
+    print("  [ViralScope AI] YouTube Shorts Real-Time Viral SaaS Dashboard")
     print(f"  * URL: {url}")
-    print("  * Server running successfully!")
+    print("  * YouTube Error 153 Prevented: HTTP Origin Active")
     print("=" * 65)
     
     # 포트 재사용 허용
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
-        try:
+    try:
+        with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
             httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\nServer stopped.")
-            sys.exit(0)
+    except OSError as e:
+        # Port already in use, which is fine (server already running)
+        print(f"Server already listening on port {PORT}.")
 
 if __name__ == "__main__":
     main()
