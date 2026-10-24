@@ -1268,6 +1268,7 @@
         <button class="m-tab-btn" id="tabBtnEditing" onclick="switchModalTab('editing')">② 컷전환 · 편집 방식 · 노래(BGM)</button>
         <button class="m-tab-btn" id="tabBtnScript" onclick="switchModalTab('script')">③ 타임라인별 대사 스크립트</button>
         <button class="m-tab-btn" id="tabBtnAction" onclick="switchModalTab('action')">🚀 내 채널 즉시 적용 (떡상 기획안 3선)</button>
+        <button class="m-tab-btn" id="tabBtnGenerateShorts" onclick="generateShortsFromCurrentVideo()" style="background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:900; border:1px solid #f59e0b; box-shadow:0 0 14px rgba(236,72,153,0.45);">✨ ⑤ 이 구성요소로 내 쇼츠 자동 만들기</button>
       </div>
 
       <!-- Two-Column: Real Video on Left, Analysis on Right -->
@@ -1304,6 +1305,16 @@
             <a href="#" target="_blank" id="modalOriginalLink" class="btn-view-original">
               <span id="modalOriginalLinkText">공식 원본 페이지 새 탭에서 열기 ↗</span>
             </a>
+          </div>
+
+          <!-- One-Click Auto Generate My Shorts Box -->
+          <div style="margin-top:14px; padding:16px; background:linear-gradient(135deg, rgba(139,92,246,0.25), rgba(236,72,153,0.2)); border:1.5px solid rgba(245,158,11,0.6); border-radius:14px; text-align:center; box-shadow:0 4px 20px rgba(139,92,246,0.3);">
+            <div style="font-size:11px; font-weight:800; color:#fef08a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">⚡ AI 자동 복제 렌더링 엔진 연동</div>
+            <div style="font-size:14px; font-weight:900; color:white; margin-bottom:6px;">이 영상 구성요소로 나만의 쇼츠 만들기</div>
+            <p style="font-size:11px; color:#d1d5db; line-height:1.4; margin-bottom:12px;">이 영상의 3초 후킹 공식과 모션 뼈대를 그대로 추출하여 내 사진/캐릭터로 9:16 완성본 쇼츠를 자동 생성합니다.</p>
+            <button onclick="generateShortsFromCurrentVideo()" style="width:100%; padding:12px; border-radius:10px; font-size:13px; font-weight:900; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:white; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span>🚀 이 구성요소로 내 쇼츠 즉시 자동 렌더링</span>
+            </button>
           </div>
 
           <!-- Helpful Sound/Playback Tip -->
@@ -5653,6 +5664,32 @@ var MASTER_VIDEO_REGISTRY = {
         window.currentDisplayedVideos = list;
       } catch (err) {
         console.error("[ViralScope Render Catch]:", err);
+      }
+    }
+
+    
+    function generateShortsFromCurrentVideo() {
+      if (!currentVideo) return;
+      closeModal();
+      openMotionSwapModal();
+      document.getElementById("targetShortUrl").value = currentVideo.videoUrl;
+      var hookText = currentVideo.hookSummary || currentVideo.title;
+      var cleanHook = hookText.replace(/^(\[[^\]]+\]|[🔥⚡🚀👑💎🏆]|\d+위)\s*/g, '').trim();
+      document.getElementById("hookSubText").value = cleanHook;
+      if (typeof showToast === "function") {
+        showToast("🎬 '" + cleanHook + "' 3초 훅 구성요소가 자동 로드되었습니다! 이제 본인 이미지를 넣고 렌더링을 시작하세요.", "success");
+      }
+    }
+
+    function generateShortsFromIdea(ideaTitle, ideaHook) {
+      closeModal();
+      openMotionSwapModal();
+      if (currentVideo) {
+        document.getElementById("targetShortUrl").value = currentVideo.videoUrl;
+      }
+      document.getElementById("hookSubText").value = ideaHook || ideaTitle;
+      if (typeof showToast === "function") {
+        showToast("💡 기획안: '" + ideaTitle + "'이 템플릿 렌더러에 자동 적용되었습니다!", "success");
       }
     }
 
