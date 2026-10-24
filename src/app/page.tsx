@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { PeriodFilter } from "@/components/PeriodFilter";
@@ -17,7 +18,7 @@ import {
   ViralVideo,
   SubTopic,
 } from "@/types";
-import { Sparkles, TrendingUp, Filter } from "lucide-react";
+import { Sparkles, TrendingUp, Filter, Film, ArrowRight } from "lucide-react";
 
 export default function HomePage() {
   // 1. 크레딧 및 Pro 구독 상태 관리 (신규 사용자 3 크레딧 기본 제공)
@@ -210,6 +211,36 @@ export default function HomePage() {
               유튜브 쇼츠(YouTube Shorts)의 폭발적 실시간 조회수 원인을 Gemini AI로 1초 만에 해부합니다.
             </p>
           </div>
+
+          {/* 킬러 기능 바로가기 배너: AI 모션 스왑 렌더링 스튜디오 */}
+          <Link
+            href="/motion-swap"
+            className="group relative overflow-hidden p-5 rounded-3xl bg-gradient-to-r from-purple-900/60 via-pink-900/50 to-indigo-950/70 border border-purple-500/40 hover:border-pink-400/80 shadow-2xl shadow-purple-950/50 transition-all transform hover:-translate-y-0.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-600/30 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <Film className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-base sm:text-lg text-white">
+                    🎬 AI 모션 스왑 기반 숏폼 템플릿 렌더링 스튜디오
+                  </span>
+                  <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-gradient-to-r from-pink-500 to-amber-500 text-white animate-pulse">
+                    NEW 킬러 기능
+                  </span>
+                </div>
+                <p className="text-xs text-gray-300 mt-0.5">
+                  타겟 숏폼의 모션 뼈대만 추출하고 내 셀카/캐릭터를 스왑! 저작권 침해 없이 3초 훅 자막까지 자동 완성
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 text-xs font-bold text-white group-hover:bg-purple-600 transition-colors flex-shrink-0">
+              <span>스튜디오 입장하기</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
 
           {/* 중앙 메인 검색창 */}
           <SearchBar onSearch={handleSearch} isLoading={isLoading} />

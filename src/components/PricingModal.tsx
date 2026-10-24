@@ -23,7 +23,7 @@ export function PricingModal({ isOpen, onClose, userEmail, userId }: PricingModa
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: userId || "guest_user",
+          userId: userId || "demo_user",
           email: userEmail || "creator@viralscope.ai",
         }),
       });
@@ -67,17 +67,17 @@ export function PricingModal({ isOpen, onClose, userEmail, userId }: PricingModa
             ViralScope Pro 무제한 플랜
           </h2>
           <p className="text-xs text-gray-400 max-w-sm mb-6">
-            기획과 조회수 고민을 0초로 단축시키는 대한민국 1등 바이럴 분석 SaaS를 무제한으로 누리세요.
+            타겟 숏폼 모션 뼈대 추출 + 내 캐릭터 스왑 + 3초 훅 자막 오버레이를 월 5,000원에 무제한으로 누리세요.
           </p>
 
           {/* Pricing Box */}
           <div className="w-full p-6 rounded-2xl bg-gradient-to-b from-primary-950/40 to-surface-card border border-primary-500/30 mb-6 flex flex-col items-center">
             <div className="flex items-baseline gap-1 text-white">
-              <span className="text-4xl font-black tracking-tight">₩19,000</span>
+              <span className="text-4xl font-black tracking-tight">₩{PRO_PLAN_CONFIG.priceKrw.toLocaleString()}</span>
               <span className="text-xs text-gray-400 font-bold">/ 월 (정기 구독)</span>
             </div>
             <span className="text-[11px] text-emerald-400 font-bold mt-1">
-              ✓ 첫 결제 시 언제든 1초 만에 해지 가능
+              ✓ 대중적 단일 요금제 · 언제든 1초 만에 원클릭 해지 가능
             </span>
           </div>
 
@@ -104,7 +104,7 @@ export function PricingModal({ isOpen, onClose, userEmail, userId }: PricingModa
             ) : (
               <>
                 <Sparkles className="w-4 h-4 fill-white" />
-                <span>지금 19,000원에 무제한 시작하기</span>
+                <span>지금 {PRO_PLAN_CONFIG.priceKrw.toLocaleString()}원에 무제한 시작하기</span>
               </>
             )}
           </button>

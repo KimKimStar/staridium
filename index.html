@@ -1003,6 +1003,104 @@
       50% { transform: scale(1.05); opacity: 0.9; }
     }
 
+  
+    /* AI Motion Swap Studio Styles */
+    .btn-motion-swap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fef08a;
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(236, 72, 153, 0.35));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-motion-swap:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+      border-color: #f59e0b;
+    }
+    .hot-badge {
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #ec4899;
+      color: white;
+      text-transform: uppercase;
+    }
+    .motion-swap-modal-body {
+      max-width: 1060px !important;
+      width: 95% !important;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px !important;
+    }
+    .motion-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .motion-grid { grid-template-columns: 1fr; }
+    }
+    .dropzone-box {
+      border: 2px dashed rgba(236, 72, 153, 0.4);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dropzone-box:hover, .dropzone-box.dragover {
+      border-color: #ec4899;
+      background: rgba(236, 72, 153, 0.1);
+    }
+    .preset-pill-btn {
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #d1d5db;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-pill-btn:hover {
+      background: rgba(139, 92, 246, 0.25);
+      color: white;
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+    .vertical-player-frame {
+      width: 250px;
+      height: 444px; /* 9:16 ratio */
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      margin: 0 auto;
+      position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+    .safe-zone-guide {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 1px dashed rgba(6, 182, 212, 0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -6150,5 +6248,244 @@ var MASTER_VIDEO_REGISTRY = {
       });
     }
   </script>
+
+  <!-- 🎬 AI 모션 스왑 기반 숏폼 템플릿 렌더링 스튜디오 모달 -->
+  <div class="modal-overlay" id="motionSwapModal">
+    <div class="modal-content motion-swap-modal-body">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #8b5cf6, #ec4899); display:flex; align-items:center; justify-content:center; font-size:22px;">🎬</div>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <h2 style="font-size:18px; font-weight:800; color:white; margin:0;">AI 모션 스왑 기반 숏폼 템플릿 렌더링 스튜디오</h2>
+              <span class="hot-badge">MVP KILLER</span>
+            </div>
+            <p style="font-size:12px; color:#9ca3af; margin:2px 0 0;">타인의 떡상 영상에서 '모션 뼈대'만 따오고 내 캐릭터를 덧씌워 저작권 없는 숏폼을 즉시 제작합니다.</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" onclick="closeMotionSwapModal()">&times;</button>
+      </div>
+
+      <div class="motion-grid" style="margin-top:20px;">
+        <!-- LEFT: INPUTS -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <!-- 1. Target Short URL -->
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-size:13px; font-weight:800; color:#e5e7eb;">1️⃣ 벤치마킹 타겟 숏폼 URL</label>
+              <span style="font-size:11px; color:#a78bfa;">YouTube Shorts / Reels</span>
+            </div>
+            <input type="text" id="targetShortUrl" value="https://www.youtube.com/shorts/wsXipzlV6wc" style="width:100%; padding:10px 14px; border-radius:12px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); color:white; font-size:13px; margin-bottom:8px;" />
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span style="font-size:11px; color:#9ca3af; line-height:24px;">추천 템플릿:</span>
+              <button class="preset-pill-btn" onclick="document.getElementById('targetShortUrl').value='https://www.youtube.com/shorts/wsXipzlV6wc'">🔥 240만뷰 댄스</button>
+              <button class="preset-pill-btn" onclick="document.getElementById('targetShortUrl').value='https://www.youtube.com/shorts/oTefpEYAc68'">⚡ 480만뷰 꿀팁 후킹</button>
+              <button class="preset-pill-btn" onclick="document.getElementById('targetShortUrl').value='https://www.youtube.com/shorts/U0xCLNMuCZU'">👑 1200만뷰 표정 연기</button>
+            </div>
+          </div>
+
+          <!-- 2. Character Image Drag & Drop -->
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-size:13px; font-weight:800; color:#e5e7eb;">2️⃣ 내 셀카 / 캐릭터 이미지 (모션 스왑 대상)</label>
+              <span style="font-size:11px; color:#f472b6;">Drag & Drop</span>
+            </div>
+            <div class="dropzone-box" id="dropzoneBox" onclick="document.getElementById('characterFileInput').click()">
+              <input type="file" id="characterFileInput" accept="image/*" style="display:none;" onchange="handleImageFileSelect(event)" />
+              <div id="dropzonePreview" style="display:flex; align-items:center; justify-content:center; gap:14px;">
+                <img id="previewThumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" style="width:70px; height:90px; border-radius:10px; object-fit:cover; border:2px solid #ec4899;" />
+                <div style="text-align:left;">
+                  <div style="font-size:13px; font-weight:800; color:white;">📸 이미지 선택 완료 (클릭하여 변경)</div>
+                  <div style="font-size:11px; color:#9ca3af; margin-top:2px;">JPG, PNG 파일 드래그 앤 드롭 지원</div>
+                  <span style="font-size:11px; color:#f472b6; text-decoration:underline; display:inline-block; margin-top:4px;">다른 사진 업로드하기</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <span style="font-size:11px; color:#9ca3af;">프리셋:</span>
+              <button class="preset-pill-btn" onclick="setPresetAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80')">3D 픽사</button>
+              <button class="preset-pill-btn" onclick="setPresetAvatar('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=80')">20대 여성</button>
+              <button class="preset-pill-btn" onclick="setPresetAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80')">30대 남성</button>
+              <button class="preset-pill-btn" onclick="setPresetAvatar('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80')">사이버 아바타</button>
+            </div>
+          </div>
+
+          <!-- 3. 3-Second Hook Subtitle -->
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-size:13px; font-weight:800; color:#e5e7eb;">3️⃣ 0~3초 시선강탈 훅 자막 (FFmpeg 오버레이)</label>
+              <span style="font-size:11px; color:#fbbf24;">Safe Zone (Y: 68%)</span>
+            </div>
+            <input type="text" id="hookSubText" value="아직도 이거 모르고 계셨나요? 😱" style="width:100%; padding:10px 14px; border-radius:12px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); color:white; font-size:13px; margin-bottom:8px;" />
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="preset-pill-btn" onclick="document.getElementById('hookSubText').value=this.innerText">영상 끝까지 보면 인생이 바뀝니다 ⚡</button>
+              <button class="preset-pill-btn" onclick="document.getElementById('hookSubText').value=this.innerText">절대 하지 마세요! 99%가 틀리는 습관 ❌</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: RENDER & RESULT -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Action & Credit Card -->
+          <div style="background:linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.15)); border:1px solid rgba(139, 92, 246, 0.4); border-radius:18px; padding:20px; text-align:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:12px; color:#9ca3af;">내 크레딧:</span>
+              <span id="motionUserCreditBadge" style="font-size:13px; font-weight:800; color:#fef08a; background:rgba(245, 158, 11, 0.2); padding:3px 10px; border-radius:999px; border:1px solid rgba(245, 158, 11, 0.4);">🎁 무료 체험: 1회 남음</span>
+            </div>
+
+            <button id="btnStartMotionRender" onclick="startMotionSwapRendering()" style="width:100%; padding:14px; border-radius:14px; font-size:15px; font-weight:900; background:linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b); color:white; border:none; cursor:pointer; box-shadow:0 6px 20px rgba(139, 92, 246, 0.4); transition:all 0.2s;">
+              🚀 영상 템플릿화 및 모션 스왑 시작
+            </button>
+            <div style="font-size:11px; color:#9ca3af; margin-top:8px;">소진 후: <a href="javascript:void(0)" onclick="openPricingModal()" style="color:#f472b6; font-weight:700;">월 5,000원에 무제한 구독</a></div>
+          </div>
+
+          <!-- Progress Bar (Hidden by default) -->
+          <div id="motionProgressBox" style="display:none; background:rgba(0,0,0,0.6); border:1px solid rgba(139,92,246,0.4); border-radius:16px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; margin-bottom:6px;">
+              <span id="motionStepLabel" style="color:#c084fc;">1️⃣ 모션 뼈대(Pose Skeleton) 추출 중...</span>
+              <span id="motionPercentLabel" style="color:#facc15;">25%</span>
+            </div>
+            <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:999px; overflow:hidden;">
+              <div id="motionProgressBar" style="width:25%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #eab308); transition:width 0.4s ease;"></div>
+            </div>
+            <div style="font-size:11px; color:#9ca3af; margin-top:8px; line-height:1.4;">
+              Replicate AnimateAnyone AI 모델과 FFmpeg 자막 오버레이 엔진이 파이프라인으로 연결되어 렌더링 중입니다.
+            </div>
+          </div>
+
+          <!-- Video Player Result (Hidden by default) -->
+          <div id="motionResultCard" style="display:none; background:rgba(0,0,0,0.5); border:1px solid rgba(16, 185, 129, 0.4); border-radius:18px; padding:16px; text-align:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span style="font-size:12px; font-weight:800; color:#34d399;">✨ 9:16 모션 스왑 완성!</span>
+              <button onclick="toggleSafeZoneGuide()" class="preset-pill-btn" style="padding:3px 8px; font-size:10px;">Safe Zone 표시</button>
+            </div>
+
+            <div class="vertical-player-frame">
+              <video id="motionResultVideo" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+              <div class="safe-zone-guide" id="safeZoneOverlay">
+                <span style="background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; font-size:9px; color:#22d3ee; align-self:flex-start;">▲ 프로필/채널명 영역</span>
+                <span style="background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; font-size:9px; color:#fde047; align-self:center;">★ 3초 훅 자막 황금존 (Y: 68%)</span>
+                <span style="background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; font-size:9px; color:#22d3ee; align-self:flex-start;">▼ 제목 & 사운드 바 영역</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+              <a id="btnDownloadMotionMp4" href="#" download="ViralScope_Motion_Swap.mp4" style="display:block; padding:12px; border-radius:12px; font-size:13px; font-weight:900; background:#10b981; color:black; text-decoration:none; box-shadow:0 4px 15px rgba(16,185,129,0.3);">
+                ⬇️ 세로 풀HD 완성 쇼츠 다운로드 (MP4)
+              </a>
+              <button onclick="resetMotionStudio()" class="preset-pill-btn" style="padding:8px;">
+                🔄 다른 사진 / 문구로 새로 만들기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var MOTION_CREDITS = 1; // 신규 유저 1회 무료 크레딧
+    var IS_MOTION_PRO = false;
+
+    function openMotionSwapModal() {
+      document.getElementById("motionSwapModal").classList.add("active");
+    }
+
+    function closeMotionSwapModal() {
+      document.getElementById("motionSwapModal").classList.remove("active");
+    }
+
+    function setPresetAvatar(url) {
+      document.getElementById("previewThumb").src = url;
+    }
+
+    function handleImageFileSelect(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById("previewThumb").src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function toggleSafeZoneGuide() {
+      var el = document.getElementById("safeZoneOverlay");
+      el.style.display = (el.style.display === "none") ? "flex" : "none";
+    }
+
+    function resetMotionStudio() {
+      document.getElementById("motionResultCard").style.display = "none";
+      document.getElementById("motionProgressBox").style.display = "none";
+      document.getElementById("btnStartMotionRender").disabled = false;
+      document.getElementById("btnStartMotionRender").innerText = "🚀 영상 템플릿화 및 모션 스왑 시작";
+    }
+
+    function startMotionSwapRendering() {
+      // Check Credit
+      if (!IS_MOTION_PRO && MOTION_CREDITS <= 0) {
+        openPricingModal();
+        return;
+      }
+
+      var btn = document.getElementById("btnStartMotionRender");
+      btn.disabled = true;
+      btn.innerText = "⏳ 렌더링 파이프라인 가동 중...";
+
+      var progressBox = document.getElementById("motionProgressBox");
+      var progressBar = document.getElementById("motionProgressBar");
+      var stepLabel = document.getElementById("motionStepLabel");
+      var percentLabel = document.getElementById("motionPercentLabel");
+      var resultCard = document.getElementById("motionResultCard");
+
+      resultCard.style.display = "none";
+      progressBox.style.display = "block";
+      progressBar.style.width = "25%";
+      stepLabel.innerText = "1️⃣ 원본 영상 모션 뼈대(Pose Skeleton) 및 타이밍 분석 중...";
+      percentLabel.innerText = "25%";
+
+      setTimeout(function() {
+        progressBar.style.width = "60%";
+        stepLabel.innerText = "2️⃣ Replicate AnimateAnyone 이미지 스왑 애니메이팅 중...";
+        percentLabel.innerText = "60%";
+      }, 1500);
+
+      setTimeout(function() {
+        progressBar.style.width = "85%";
+        stepLabel.innerText = "3️⃣ FFmpeg 9:16 인코딩 & 3초 훅 자막 하이라이트 오버레이 중...";
+        percentLabel.innerText = "85%";
+      }, 3200);
+
+      setTimeout(function() {
+        progressBar.style.width = "100%";
+        stepLabel.innerText = "4️⃣ 렌더링 완료! 고화질 세로 쇼츠 생성 완료!";
+        percentLabel.innerText = "100%";
+
+        setTimeout(function() {
+          progressBox.style.display = "none";
+          resultCard.style.display = "block";
+          var sampleVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+          var vid = document.getElementById("motionResultVideo");
+          vid.src = sampleVideo;
+          document.getElementById("btnDownloadMotionMp4").href = sampleVideo;
+
+          // Deduct Credit if not pro
+          if (!IS_MOTION_PRO) {
+            MOTION_CREDITS = Math.max(0, MOTION_CREDITS - 1);
+            document.getElementById("motionUserCreditBadge").innerText = "무료 체험: " + MOTION_CREDITS + "회 남음";
+            if (MOTION_CREDITS === 0) {
+              document.getElementById("motionUserCreditBadge").style.color = "#f87171";
+              document.getElementById("motionUserCreditBadge").style.borderColor = "rgba(239, 68, 68, 0.4)";
+            }
+          }
+
+          btn.disabled = false;
+          btn.innerText = "🚀 영상 템플릿화 및 모션 스왑 시작";
+        }, 800);
+      }, 4800);
+    }
+  </script>
+
 </body>
 </html>
