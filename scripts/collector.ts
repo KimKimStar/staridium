@@ -36,7 +36,7 @@ const TARGET_KEYWORDS = [
 
 interface RawVideoItem {
   id: string;
-  platform: 'shorts' | 'reels' | 'tiktok';
+  platform: 'shorts';
   title: string;
   video_url: string;
   thumbnail_url: string;

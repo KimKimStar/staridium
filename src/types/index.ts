@@ -1,4 +1,4 @@
-export type PlatformType = "all" | "shorts" | "reels" | "tiktok";
+export type PlatformType = "shorts" | "all";
 
 export type PeriodFilterType = "1d" | "1w" | "1m" | "3m" | "6m" | "1y" | "all_time";
 
@@ -12,7 +12,7 @@ export interface SubTopic {
 export interface ViralVideo {
   id: string;
   title: string;
-  platform: "shorts" | "reels" | "tiktok";
+  platform: "shorts";
   videoUrl: string;
   thumbnail: string;
   views: number;

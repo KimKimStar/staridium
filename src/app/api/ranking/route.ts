@@ -138,7 +138,7 @@ function generateFallbackRanking(keyword: string, period: PeriodFilterType, plat
       daysAgo = Math.floor((i * 3.6) + 1);
     }
 
-    const plat = platform === "all" ? (i % 3 === 1 ? "shorts" : i % 3 === 2 ? "reels" : "tiktok") : platform;
+    const plat = "shorts";
     const thumb = THUMB_POOL[(i - 1 + pOffset) % THUMB_POOL.length];
 
     let title = "";
@@ -160,8 +160,8 @@ function generateFallbackRanking(keyword: string, period: PeriodFilterType, plat
       id: `vid-${keyword}-${period}-${i}`,
       rank: i,
       title: title,
-      platform: plat,
-      videoUrl: plat === "shorts" ? "https://www.youtube.com/shorts/kJQP7kiw5Fk" : "https://www.instagram.com/reels/CkJQP7kiw5Fk101/",
+      platform: "shorts",
+      videoUrl: `https://www.youtube.com/shorts/kJQP7kiw5Fk`,
       thumbnail: thumb,
       views: baseViews,
       viewsFormatted: `${(baseViews / 10000).toFixed(0)}만회`,

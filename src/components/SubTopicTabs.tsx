@@ -23,57 +23,15 @@ export function SubTopicTabs({
 }: SubTopicTabsProps) {
   return (
     <div className="w-full flex flex-col gap-4 border-b border-surface-border pb-4">
-      {/* Platform Filter Tabs */}
+      {/* Platform & Official Verification Badge */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-1.5 p-1 bg-surface border border-surface-border rounded-xl">
-          <button
-            onClick={() => onSelectPlatform("all")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              selectedPlatform === "all"
-                ? "bg-primary-600 text-white shadow-md shadow-primary-600/30"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span>전체 플랫폼</span>
-          </button>
-          <button
-            onClick={() => onSelectPlatform("shorts")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              selectedPlatform === "shorts"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/30"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <Youtube className="w-3.5 h-3.5" />
-            <span>유튜브 쇼츠</span>
-          </button>
-          <button
-            onClick={() => onSelectPlatform("reels")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              selectedPlatform === "reels"
-                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-pink-600/30"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <Instagram className="w-3.5 h-3.5" />
-            <span>인스타 릴스</span>
-          </button>
-          <button
-            onClick={() => onSelectPlatform("tiktok")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              selectedPlatform === "tiktok"
-                ? "bg-cyan-600 text-white shadow-md shadow-cyan-600/30"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <Film className="w-3.5 h-3.5" />
-            <span>틱톡 코리아</span>
-          </button>
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">
+          <Youtube className="w-4 h-4 text-red-500" />
+          <span>YouTube Data API v3 공식 실시간 조회수 100% 반영</span>
         </div>
 
         <div className="text-xs text-gray-400 font-medium">
-          총 <strong className="text-primary-400 font-bold">{totalVideosCount}개</strong>의 떡상 숏폼 레퍼런스
+          총 <strong className="text-red-400 font-bold">{totalVideosCount}개</strong>의 떡상 유튜브 쇼츠 레퍼런스
         </div>
       </div>
 

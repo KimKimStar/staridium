@@ -207,7 +207,7 @@ export default function HomePage() {
               터지는 숏폼의 <span className="bg-gradient-to-r from-primary-400 to-accent-pink bg-clip-text text-transparent">성공 공식</span>을 즉시 복제하세요
             </h1>
             <p className="text-xs sm:text-sm text-gray-400">
-              유튜브 쇼츠, 인스타그램 릴스, 틱톡의 폭발적 조회수 원인을 Gemini AI로 1초 만에 해부합니다.
+              유튜브 쇼츠(YouTube Shorts)의 폭발적 실시간 조회수 원인을 Gemini AI로 1초 만에 해부합니다.
             </p>
           </div>
 

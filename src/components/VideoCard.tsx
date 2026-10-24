@@ -41,8 +41,8 @@ export function VideoCard({ video, rank, onOpenAnalysis }: VideoCardProps) {
 
       {/* Platform & Viral Score Badge */}
       <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 text-[11px] font-bold text-white">
-        {getPlatformIcon(video.platform)}
-        <span>{getPlatformLabel(video.platform)}</span>
+        <Youtube className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+        <span>YouTube Shorts</span>
         <span className="text-emerald-400 ml-1">🔥 {video.viralScore}점</span>
       </div>
 
