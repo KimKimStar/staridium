@@ -4901,143 +4901,195 @@ var MASTER_VIDEO_REGISTRY = {
       var subTopics = cat.subTopics || [];
       var catSubTopics = subTopics;
 
-      // Base category pool
-      var basePool = (TOPIC_SPECIFIC_ITEMS && TOPIC_SPECIFIC_ITEMS[topicKey]) ? TOPIC_SPECIFIC_ITEMS[topicKey].slice() : [];
-      if (!basePool || basePool.length === 0) {
-        basePool = (TOPIC_SPECIFIC_ITEMS && TOPIC_SPECIFIC_ITEMS.humor) ? TOPIC_SPECIFIC_ITEMS.humor.slice() : [];
+      // 1. PRIMARY CATEGORY POOL: Strict Topic Separation!
+      var rawPool = [];
+      if (topicKey === "total_kr") {
+        rawPool = (TOPIC_SPECIFIC_ITEMS && TOPIC_SPECIFIC_ITEMS.total_kr) ? TOPIC_SPECIFIC_ITEMS.total_kr.slice() : [];
+      } else if (TOPIC_SPECIFIC_ITEMS && TOPIC_SPECIFIC_ITEMS[topicKey]) {
+        rawPool = TOPIC_SPECIFIC_ITEMS[topicKey].slice();
+      } else {
+        rawPool = (TOPIC_SPECIFIC_ITEMS && TOPIC_SPECIFIC_ITEMS.humor) ? TOPIC_SPECIFIC_ITEMS.humor.slice() : [];
       }
 
-      // ZERO-DUPLICATE POLICY: Every video in the pool must be unique!
+      // Filter to strictly unique items by youtubeId
       var fullUniquePool = [];
       var seenIds = {};
-      for (var b = 0; b < basePool.length; b++) {
-        var bYt = basePool[b].youtubeId;
-        if (!seenIds[bYt]) {
+      for (var b = 0; b < rawPool.length; b++) {
+        var bYt = rawPool[b].youtubeId;
+        if (bYt && !seenIds[bYt]) {
           seenIds[bYt] = true;
-          fullUniquePool.push(basePool[b]);
+          fullUniquePool.push(rawPool[b]);
         }
       }
 
-      // If user requested more videos than basePool via "더보기", pull additional UNIQUE videos from other categories!
-      if (totalCount > fullUniquePool.length) {
-        for (var otherKey in TOPIC_SPECIFIC_ITEMS) {
-          if (otherKey !== topicKey) {
-            var extraItems = TOPIC_SPECIFIC_ITEMS[otherKey] || [];
-            for (var e = 0; e < extraItems.length; e++) {
-              var exItem = extraItems[e];
-              if (!seenIds[exItem.youtubeId]) {
-                seenIds[exItem.youtubeId] = true;
-                fullUniquePool.push(exItem);
-                if (fullUniquePool.length >= totalCount) break;
-              }
-            }
-          }
-          if (fullUniquePool.length >= totalCount) break;
+      // 2. PERIOD-SPECIFIC VIEWS & DETERMINISTIC RE-RANKING
+      // Calculate period views for every item strictly using MASTER_VIDEO_REGISTRY and youtubeId seed
+      var ratedItems = [];
+      for (var i = 0; i < fullUniquePool.length; i++) {
+        var baseItem = fullUniquePool[i];
+        var realYtId = baseItem.youtubeId || "BEDwfDQai3A";
+        var masterViews = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[realYtId]) ? window.MASTER_VIDEO_REGISTRY[realYtId] : 50000000;
+
+        // Deterministic seed from youtubeId
+        var seed = 0;
+        for (var s = 0; s < realYtId.length; s++) {
+          seed = (seed * 31 + realYtId.charCodeAt(s)) % 100000;
         }
+
+        var periodViews = masterViews;
+        var daysAgo = 0;
+        var timeString = "";
+
+        if (timeFilter === "1d") {
+          // 24시간 실시간 조회수 (150만 ~ 380만회)
+          periodViews = Math.floor(1500000 + ((masterViews % 1500000) * 0.8) + (seed % 1000000));
+          var hoursAgo = ((seed % 19) + 1);
+          timeString = hoursAgo + "시간 전 (오늘)";
+          daysAgo = 0;
+        } else if (timeFilter === "1w") {
+          // 7일간 누적 조회수 (450만 ~ 950만회)
+          periodViews = Math.floor(4500000 + ((masterViews % 3000000) * 1.1) + ((seed * 7) % 2000000));
+          daysAgo = ((seed % 6) + 1);
+          timeString = daysAgo + "일 전";
+        } else if (timeFilter === "1m") {
+          // 1달 누적 조회수 (1100만 ~ 2100만회)
+          periodViews = Math.floor(11000000 + ((masterViews % 6000000) * 1.1) + ((seed * 13) % 4000000));
+          var weeksAgo = ((seed % 3) + 1);
+          timeString = weeksAgo + "주 전";
+          daysAgo = weeksAgo * 7;
+        } else if (timeFilter === "3m") {
+          // 3달 누적 조회수 (2200만 ~ 3500만회)
+          periodViews = Math.floor(22000000 + ((masterViews % 8000000) * 1.1) + ((seed * 17) % 5000000));
+          var monthsAgo = ((seed % 2) + 1);
+          timeString = monthsAgo + "달 전";
+          daysAgo = monthsAgo * 30;
+        } else if (timeFilter === "6m") {
+          // 6달 누적 조회수 (3400만 ~ 4900만회)
+          periodViews = Math.floor(34000000 + ((masterViews % 10000000) * 1.1) + ((seed * 23) % 5000000));
+          var monthsAgo6 = ((seed % 3) + 3);
+          timeString = monthsAgo6 + "달 전";
+          daysAgo = monthsAgo6 * 30;
+        } else {
+          // 1y / 역대 누적 조회수 (4500만 ~ 6000만회)
+          periodViews = masterViews;
+          var monthsAgoY = ((seed % 6) + 6);
+          timeString = monthsAgoY + "달 전";
+          daysAgo = monthsAgoY * 30;
+        }
+
+        // Check newly emerged
+        var isNewlyEmerged = false;
+        if (window.NEWLY_EMERGED_VIDEOS && window.NEWLY_EMERGED_VIDEOS[baseItem.id]) {
+          isNewlyEmerged = true;
+          periodViews = Math.floor(periodViews * 1.35);
+        }
+
+        var surgeBonus = Math.floor(100000 + ((seed % 55) * 10000)); // 10만 ~ 65만회
+        var surge1d = "+" + (180 + Math.floor((seed % 30) * 7)) + "%";
+        var surge7d = "+" + (340 + Math.floor((seed % 30) * 12)) + "%";
+
+        ratedItems.push({
+          baseItem: baseItem,
+          realYtId: realYtId,
+          periodViews: periodViews,
+          masterViews: masterViews,
+          daysAgo: daysAgo,
+          timeString: timeString,
+          surgeBonus: surgeBonus,
+          surge1d: surge1d,
+          surge7d: surge7d,
+          isNewlyEmerged: isNewlyEmerged,
+          seed: seed
+        });
       }
 
-      var poolToRender = fullUniquePool.slice(0, Math.max(fullUniquePool.length, totalCount));
+      // Sort items by period views descending so #1 video for this period rises to top!
+      ratedItems.sort(function(a, b) { return b.periodViews - a.periodViews; });
 
+      var displayItems = ratedItems.slice(0, totalCount);
       var videos = [];
 
-      for (var i = 0; i < poolToRender.length; i++) {
-        var baseItem = poolToRender[i];
-        var realYtId = baseItem.youtubeId || "BEDwfDQai3A";
+      for (var idx = 0; idx < displayItems.length; idx++) {
+        var itemData = displayItems[idx];
+        var baseItem = itemData.baseItem;
+        var realYtId = itemData.realYtId;
         var exactUrl = "https://www.youtube.com/shorts/" + realYtId;
         var realThumbnail = baseItem.thumbnail || ("https://i.ytimg.com/vi/" + realYtId + "/hqdefault.jpg");
         var authorDisplay = baseItem.author || baseItem.ytChannel || "한국 크리에이터";
-        var plat = "shorts";
+        var rank = idx + 1;
 
-        // Upload Time Distribution
-        var daysAgo = 0;
-        var timeString = "";
+        var viewsFormatted = (itemData.periodViews >= 100000000) 
+          ? (itemData.periodViews / 100000000).toFixed(1) + "억회" 
+          : (itemData.periodViews >= 10000) 
+            ? Math.floor(itemData.periodViews / 10000).toLocaleString() + "만회" 
+            : itemData.periodViews.toLocaleString() + "회";
+
+        var likesFormatted = (itemData.periodViews * 0.052 >= 10000) 
+          ? ((itemData.periodViews * 0.052) / 10000).toFixed(1) + "만" 
+          : Math.floor(itemData.periodViews * 0.052).toLocaleString();
+
+        // Period dynamic title prefixes
+        var fullTitle = "";
+        var cleanOrigTitle = baseItem.title.replace(/^(\[[^\]]+\]|[🔥⚡🚀👑💎🏆]|\d+위)\s*/g, '').trim();
+
         if (timeFilter === "1d") {
-          daysAgo = 0;
-          var hoursAgo = ((i * 3) % 23) + 1;
-          timeString = hoursAgo + "시간 전 (오늘)";
+          if (rank === 1) fullTitle = "🔥 [오늘 1위 실시간] " + cleanOrigTitle + " (24h 급상승)";
+          else if (rank === 2) fullTitle = "🔥 [오늘 떡상 TOP] " + cleanOrigTitle;
+          else if (rank === 3) fullTitle = "🔥 [오늘 화제작] " + cleanOrigTitle;
+          else fullTitle = "🔥 [오늘 #" + rank + "] " + cleanOrigTitle;
         } else if (timeFilter === "1w") {
-          daysAgo = ((i % 6) + 1);
-          timeString = daysAgo + "일 전";
+          if (rank === 1) fullTitle = "⚡ [이번 주 1위] " + cleanOrigTitle + " (주간 베스트)";
+          else if (rank === 2) fullTitle = "⚡ [주간 떡상 TOP] " + cleanOrigTitle;
+          else if (rank === 3) fullTitle = "⚡ [주간 화제작] " + cleanOrigTitle;
+          else fullTitle = "⚡ [주간 #" + rank + "] " + cleanOrigTitle;
         } else if (timeFilter === "1m") {
-          daysAgo = ((i % 22) + 8);
-          timeString = Math.floor(daysAgo / 7) + "주 전";
+          if (rank === 1) fullTitle = "🚀 [월간 1위 챔피언] " + cleanOrigTitle + " (30일 누적 1위)";
+          else if (rank === 2) fullTitle = "🚀 [월간 베스트] " + cleanOrigTitle;
+          else fullTitle = "🚀 [월간 #" + rank + "] " + cleanOrigTitle;
         } else if (timeFilter === "3m") {
-          daysAgo = ((i % 60) + 31);
-          timeString = Math.floor(daysAgo / 30) + "달 전";
+          if (rank === 1) fullTitle = "👑 [분기 1위 스테디] " + cleanOrigTitle;
+          else if (rank === 2) fullTitle = "👑 [3개월 챔피언] " + cleanOrigTitle;
+          else fullTitle = "👑 [3개월 #" + rank + "] " + cleanOrigTitle;
         } else if (timeFilter === "6m") {
-          daysAgo = ((i % 90) + 91);
-          timeString = Math.floor(daysAgo / 30) + "달 전";
+          if (rank === 1) fullTitle = "💎 [반기 결산 메가바이럴] " + cleanOrigTitle;
+          else if (rank === 2) fullTitle = "💎 [6개월 1티어] " + cleanOrigTitle;
+          else fullTitle = "💎 [6개월 #" + rank + "] " + cleanOrigTitle;
         } else {
-          daysAgo = Math.floor((i * 3.6) + 1);
-          if (daysAgo <= 1) timeString = "오늘";
-          else if (daysAgo <= 7) timeString = daysAgo + "일 전";
-          else if (daysAgo <= 30) timeString = Math.floor(daysAgo / 7) + "주 전";
-          else timeString = Math.floor(daysAgo / 30) + "달 전";
+          if (rank === 1) fullTitle = "🏆 [역대 1위 명예의 전당] " + cleanOrigTitle;
+          else if (rank === 2) fullTitle = "🏆 [연간 챔피언] " + cleanOrigTitle;
+          else fullTitle = "🏆 [역대 #" + rank + "] " + cleanOrigTitle;
         }
-
-        // Monotonic View Count Hierarchy (Single Source of Truth)
-        var masterAllTimeViews = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[realYtId]) ? window.MASTER_VIDEO_REGISTRY[realYtId] : 28500000;
-        var periodRatio = 1.0;
-        if (timeFilter === "1d") periodRatio = 0.048;      // 24h 실시간 조회수
-        else if (timeFilter === "1w") periodRatio = 0.125; // 7일간 누적 조회수
-        else if (timeFilter === "1m") periodRatio = 0.26;  // 1개월 누적 조회수
-        else if (timeFilter === "3m") periodRatio = 0.48;  // 3개월 누적 조회수
-        else if (timeFilter === "6m") periodRatio = 0.72;  // 6개월 누적 조회수
-        else periodRatio = 1.0;                            // 1년/역대 누적 조회수
-
-        var baseViews = Math.floor(masterAllTimeViews * periodRatio);
-
-        // Apply Hourly Dynamic Rebalancing Delta
-        var isNewlyEmerged = false;
-        var emergenceInfo = window.NEWLY_EMERGED_VIDEOS ? window.NEWLY_EMERGED_VIDEOS[baseItem.id] : null;
-        if (emergenceInfo) {
-          isNewlyEmerged = true;
-          baseViews = Math.floor(baseViews * (emergenceInfo.surgeMultiplier || 1.35));
-        } else if (window.HOURLY_REBALANCE_CYCLE > 0) {
-          var charSeed = (realYtId.charCodeAt(0) * 19 + realYtId.charCodeAt(realYtId.length - 1) * 29 + window.HOURLY_REBALANCE_CYCLE * 43) % 100;
-          var hourlyBonus = Math.floor((baseViews * 0.08) * (charSeed / 100));
-          baseViews += hourlyBonus;
-        }
-
-        var viewsFormatted = (baseViews >= 100000000) ? (baseViews / 100000000).toFixed(1) + "억회" : (baseViews >= 10000) ? Math.floor(baseViews / 10000).toLocaleString() + "만회" : baseViews.toLocaleString() + "회";
-        var likesFormatted = (baseViews * 0.052 >= 10000) ? (baseViews * 0.052 / 10000).toFixed(1) + "만" : Math.floor(baseViews * 0.052).toLocaleString();
-
-        var surge1d = "+" + (180 + Math.floor((poolToRender.length - i) * 6)) + "%";
-        var surge7d = "+" + (340 + Math.floor((poolToRender.length - i) * 10)) + "%";
-        var surgeBonus24h = Math.floor(100000 + ((i * 17) % 55) * 10000); // 10만 ~ 65만회 급상승치
-
-        var fullTitle = baseItem.title;
 
         var subId = "all";
         if (catSubTopics && catSubTopics.length > 0) {
-          var targetSubIdx = (baseItem.subIndex !== undefined) ? (baseItem.subIndex % catSubTopics.length) : (i % catSubTopics.length);
+          var targetSubIdx = (baseItem.subIndex !== undefined) ? (baseItem.subIndex % catSubTopics.length) : (idx % catSubTopics.length);
           subId = (catSubTopics[targetSubIdx] && catSubTopics[targetSubIdx].id) ? catSubTopics[targetSubIdx].id : "all";
         }
 
-        var analysis = generateDetailedVideoAnalysis(baseItem, topicKey, i + 1, timeFilter, topicName);
+        var analysis = generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, topicName);
 
         videos.push({
-          id: topicKey + "-" + timeFilter + "-" + platform + "-" + (i + 1),
-          rank: i + 1,
+          id: topicKey + "-" + timeFilter + "-" + platform + "-" + rank,
+          rank: rank,
           title: fullTitle,
           platform: 'shorts',
           subTopicId: subId,
-          views: baseViews,
+          views: itemData.periodViews,
           viewsFormatted: viewsFormatted,
           likesFormatted: likesFormatted,
-          duration: (20 + (i % 35)) + "s",
+          duration: (20 + (idx % 35)) + "s",
           author: authorDisplay,
           thumbnail: realThumbnail,
           youtubeId: realYtId,
           videoUrl: exactUrl,
-          daysAgo: daysAgo,
-          timeString: timeString,
-          surge1d: surge1d,
-          surge7d: surge7d,
-          surgeViews24h: surgeBonus24h,
-          surgeScore: 800 - (i * 7) + (daysAgo === 0 ? 300 : daysAgo <= 7 ? 150 : 0) + (isNewlyEmerged ? 400 : 0),
-          viralScore: Math.max(88, 99 - Math.floor(i / 8)),
-          isNewlyEmerged: isNewlyEmerged,
+          daysAgo: itemData.daysAgo,
+          timeString: itemData.timeString,
+          surge1d: itemData.surge1d,
+          surge7d: itemData.surge7d,
+          surgeViews24h: itemData.surgeBonus,
+          surgeScore: 800 - (idx * 7) + (itemData.daysAgo === 0 ? 300 : itemData.daysAgo <= 7 ? 150 : 0) + (itemData.isNewlyEmerged ? 400 : 0),
+          viralScore: Math.max(88, 99 - Math.floor(idx / 8)),
+          isNewlyEmerged: itemData.isNewlyEmerged,
           hookSummary: analysis.hookSummary,
           viralReason: analysis.viralReason,
           hookAnalysis: analysis.hookAnalysis,
@@ -5048,29 +5100,14 @@ var MASTER_VIDEO_REGISTRY = {
         });
       }
 
-      // Filter or Prioritize by subTopic
+      // Filter by subTopic if specific subtopic selected
       if (subTopicId !== "all") {
         var matchingVideos = videos.filter(function(v) { return v.subTopicId === subTopicId; });
         var otherVideos = videos.filter(function(v) { return v.subTopicId !== subTopicId; });
         videos = matchingVideos.concat(otherVideos);
       }
 
-      // Strict Universal Sort by View Count or Criteria
-      if (surgeFilter === "surge_1d") {
-        videos.sort(function(a, b) { return b.surgeScore - a.surgeScore; });
-      } else if (surgeFilter === "surge_1w") {
-        videos.sort(function(a, b) { return (b.views / Math.max(1, b.daysAgo)) - (a.views / Math.max(1, a.daysAgo)); });
-      } else {
-        if (sortType === "views") {
-          videos.sort(function(a, b) { return b.views - a.views; });
-        } else if (sortType === "surge") {
-          videos.sort(function(a, b) { return b.surgeScore - a.surgeScore; });
-        } else {
-          videos.sort(function(a, b) { return b.viralScore - a.viralScore; });
-        }
-      }
-
-      // Re-assign ranks 1 to N strictly
+      // Re-assign ranks 1 to N
       for (var r = 0; r < videos.length; r++) {
         videos[r].rank = r + 1;
       }
@@ -5081,8 +5118,6 @@ var MASTER_VIDEO_REGISTRY = {
       };
     }
 
-    // 1-Hour Real-Time Auto-Rebalance Trigger
-    // 1-Hour Real-Time Auto-Rebalance Trigger (Rebalances Dedicated Surge Pools Too!)
     function rebalanceAllVideosHourly(isManual) {
       window.HOURLY_REBALANCE_CYCLE++;
       try {
@@ -5146,12 +5181,19 @@ var MASTER_VIDEO_REGISTRY = {
 
     // Select Category (Unified for Top Pills, Left Sidebar, and Search)
     function selectCategory(key) {
+      window.currentSpecialView = null; // Unconditionally clear special view!
       currentTopicKey = key;
-      currentDisplayLimit = 30; // reset limit
+      currentDisplayLimit = 30;
       var cat = CATEGORIES.find(function(c) { return c.key === key; }) || CATEGORIES[0];
 
       var label = document.getElementById("currentTopicLabel");
       if (label) label.innerText = cat.name;
+
+      var buttons = document.querySelectorAll(".time-filter-section .surge-btn");
+      for (var s = 0; s < buttons.length; s++) buttons[s].classList.remove("active");
+
+      var wrap = document.getElementById("subTopicsWrap");
+      if (wrap) wrap.style.display = (cat.subTopics && cat.subTopics.length > 0) ? "flex" : "none";
 
       activeSubId = "all";
       renderCategoryPills();
@@ -5212,22 +5254,25 @@ var MASTER_VIDEO_REGISTRY = {
     }
 
     function setTimeFilter(filter, btn) {
+      window.currentSpecialView = null; // Unconditionally clear special view!
       activeTimeFilter = filter;
       activeSurgeFilter = null;
-      var buttons = document.querySelectorAll(".time-filter-section .t-btn");
+
+      var buttons = document.querySelectorAll(".time-filter-btn");
       for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
       if (btn) btn.classList.add("active");
 
-      var grid = document.getElementById("videoGrid");
-      if (grid) {
-        grid.style.opacity = "1";
-        grid.classList.remove("grid-fade-in");
-        void grid.offsetWidth; // force reflow for smooth animation
-        grid.classList.add("grid-fade-in");
-      }
-      renderVideos();
+      var surgeBtns = document.querySelectorAll(".time-filter-section .surge-btn");
+      for (var s = 0; s < surgeBtns.length; s++) surgeBtns[s].classList.remove("active");
 
-      showToast("🕒 [" + getTimeFilterLabel(filter) + "] 랭킹으로 전환되었습니다 (조회수 역순 정렬)", "info");
+      var wrap = document.getElementById("subTopicsWrap");
+      var cat = CATEGORIES.find(function(c) { return c.key === currentTopicKey; });
+      if (wrap) wrap.style.display = (cat && cat.subTopics && cat.subTopics.length > 0) ? "flex" : "none";
+
+      var label = document.getElementById("currentTopicLabel");
+      if (label && cat) label.innerText = cat.name;
+
+      renderVideos();
     }
 
     function getTimeFilterLabel(f) {
