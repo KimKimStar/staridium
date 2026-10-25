@@ -6,32 +6,49 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class",
+  darkMode: ["class"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Pretendard", "-apple-system", "BlinkMacSystemFont", "system-ui", "Roboto", "sans-serif"],
+      },
       colors: {
-        background: "#090d16",
-        surface: "#111827",
-        "surface-card": "rgba(23, 31, 48, 0.7)",
-        "surface-border": "rgba(255, 255, 255, 0.08)",
+        background: "#020617", // slate-950
+        surface: "#0f172a", // slate-900
+        "surface-card": "#1e293b", // slate-800
+        "surface-border": "#334155", // slate-700
         primary: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          500: "#8b5cf6",
+          50: "#eff6ff",
+          100: "#dbeafe",
+          400: "#60a5fa",
+          500: "#3b82f6", // neon blue
+          600: "#2563eb",
+          700: "#1d4ed8",
+        },
+        violet: {
+          400: "#a78bfa",
+          500: "#8b5cf6", // neon violet
           600: "#7c3aed",
           700: "#6d28d9",
         },
         accent: {
+          blue: "#3b82f6",
+          violet: "#8b5cf6",
           pink: "#ec4899",
           cyan: "#06b6d4",
           emerald: "#10b981",
           amber: "#f59e0b",
         },
       },
+      borderRadius: {
+        lg: "0.75rem",
+        md: "0.5rem",
+        sm: "0.375rem",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "hero-glow": "radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.25) 0%, rgba(6, 182, 212, 0.1) 40%, transparent 70%)",
-        "card-glow": "linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)",
+        "hero-glow": "radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 35%, transparent 70%)",
+        "card-shimmer": "linear-gradient(90deg, rgba(30, 41, 59, 0) 0%, rgba(51, 65, 85, 0.5) 50%, rgba(30, 41, 59, 0) 100%)",
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
