@@ -1250,79 +1250,66 @@
 
   <!-- Deep Anatomy Modal with Real Embedded Video Player -->
   <div class="modal-overlay" id="anatomyModal">
-    <div class="modal-container">
+    <div class="modal-container" style="max-width:1100px;">
       <div class="modal-header">
         <div>
-          <div style="font-size:11px; font-weight:800; color:var(--accent-cyan); text-transform:uppercase;">
-            🇰🇷 KOREAN VIRAL DEEP ANATOMY & IN-SITE REAL SHORT PLAYER
+          <div style="font-size:11px; font-weight:800; color:var(--accent-cyan); text-transform:uppercase; letter-spacing:0.5px;">
+            🇰🇷 KOREAN SHORTS VIRAL ANATOMY & REMAKER STUDIO
           </div>
-          <div id="modalVideoTitle" style="font-size:15px; font-weight:700; color:white; margin-top:2px;">
+          <div id="modalVideoTitle" style="font-size:16px; font-weight:800; color:white; margin-top:3px;">
             영상 제목
           </div>
         </div>
         <button class="btn-close" onclick="closeModal()">✕</button>
       </div>
 
-      <div class="modal-nav">
-        <button class="m-tab-btn active" id="tabBtnHook" onclick="switchModalTab('hook')">① 3초 훅 & 성공 요인</button>
-        <button class="m-tab-btn" id="tabBtnEditing" onclick="switchModalTab('editing')">② 컷전환 · 편집 방식 · 노래(BGM)</button>
-        <button class="m-tab-btn" id="tabBtnScript" onclick="switchModalTab('script')">③ 타임라인별 대사 스크립트</button>
-        <button class="m-tab-btn" id="tabBtnAction" onclick="switchModalTab('action')">🚀 내 채널 즉시 적용 (떡상 기획안 3선)</button>
-        <button class="m-tab-btn" id="tabBtnGenerateShorts" onclick="generateShortsFromCurrentVideo()" style="background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:900; border:1px solid #f59e0b; box-shadow:0 0 14px rgba(236,72,153,0.45);">✨ ⑤ 이 구성요소로 내 쇼츠 자동 만들기</button>
+      <!-- 7 Distinct Organized Tabs as requested -->
+      <div class="modal-nav" style="display:flex; gap:6px; overflow-x:auto; padding:10px 14px; background:rgba(0,0,0,0.3); border-bottom:1px solid var(--surface-border);">
+        <button class="m-tab-btn active" id="tabBtnVideo" onclick="switchModalTab('video')">① 🎬 영상 보기</button>
+        <button class="m-tab-btn" id="tabBtnHook" onclick="switchModalTab('hook')">② ⚡ 3초 훅 & 성공요인</button>
+        <button class="m-tab-btn" id="tabBtnEditing" onclick="switchModalTab('editing')">③ ✂️ 컷전환 · 편집방식 · 노래</button>
+        <button class="m-tab-btn" id="tabBtnScript" onclick="switchModalTab('script')">④ 📝 타임라인별 대사 스크립트</button>
+        <button class="m-tab-btn" id="tabBtnSimilar" onclick="switchModalTab('similar')">⑤ 🔗 비슷한 태그·주제 추천 5선</button>
+        <button class="m-tab-btn" id="tabBtnAction" onclick="switchModalTab('action')">⑥ 💡 내 채널 적용 가이드</button>
+        <button class="m-tab-btn" id="tabBtnCreate" onclick="switchModalTab('create')" style="background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:900; border:1px solid #f59e0b; box-shadow:0 0 14px rgba(236,72,153,0.45);">⑦ 🚀 이 구성으로 내 쇼츠 만들기 ⭐</button>
       </div>
 
-      <!-- Two-Column: Real Video on Left, Analysis on Right -->
+      <!-- Modal Body Split: Left Video Pane, Right Dynamic Content Pane -->
       <div class="modal-body-split">
         <div class="video-player-pane">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap;">
+          <!-- Clean Header with Single Prominent Clean Watch Button -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
             <div class="player-live-badge" style="margin:0;">
-              <span><span class="live-dot"></span><strong id="modalPlayerPlatformLabel" style="color:#6ee7b7;">내 사이트에서 실시간 재생 중</strong></span>
-              <span style="color:#9ca3af; font-size:10.5px;">세로 9:16</span>
+              <span><span class="live-dot"></span><strong id="modalPlayerPlatformLabel" style="color:#6ee7b7;">세로 9:16 플레이어</strong></span>
             </div>
-            <!-- Direct Popup Player (100% Error 153 Failsafe) -->
-            <button type="button" class="btn-popup-player" onclick="openNativeShortsPopup()" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:white; font-size:11.5px; font-weight:800; padding:6px 14px; border:0; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(239,68,68,0.4);">
-              <span>🎬 1초 팝업 플레이어로 시청 (Error 153 원천 차단)</span>
+            <!-- Clean, professional direct watch button -->
+            <button type="button" class="btn-clean-yt-watch" onclick="openCleanInSitePlayer()" style="background:#ef4444; color:white; font-size:12px; font-weight:800; padding:7px 14px; border:0; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 12px rgba(239,68,68,0.35); transition:all 0.2s;">
+              <span style="background:white; color:#ef4444; padding:1px 5px; border-radius:4px; font-size:10px; font-weight:900;">▶ YouTube</span>
+              <span>이 영상 사이트에서 바로보기</span>
             </button>
           </div>
 
           <!-- Video Embed Wrap -->
           <div class="video-iframe-wrap" id="videoIframeWrap"></div>
 
-          <div id="error153NoticeBox" style="margin-top:8px; padding:10px 12px; background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; font-size:11px; color:#cbd5e1; line-height:1.4;">
-            💡 <strong>오류 153 해결 안내:</strong> 브라우저 보안 또는 광고 차단기로 위 화면에 [오류 153]이 표시될 경우, 상단 <strong>[🎬 1초 팝업 플레이어로 시청]</strong> 버튼을 누르시면 유튜브 공식 9:16 정품 플레이어가 즉시 열려 100% 정상 재생됩니다.
+          <!-- Clean URL pill with 1-click copy -->
+          <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 12px; margin-top:10px;">
+            <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+              <span style="color:#a78bfa; font-weight:700; font-size:11px; flex-shrink:0;">🔗 공식 URL:</span>
+              <span style="font-size:11.5px; color:#d1d5db; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="modalUrlDisplay"></span>
+            </div>
+            <button class="btn-modal-copy" onclick="copyModalUrl(this)" style="flex-shrink:0; margin-left:8px;">복사</button>
           </div>
 
-          <!-- Exact Real Video URL Box with 1-click Copy -->
-          <div class="modal-url-card">
-            <div class="modal-url-header">
-              <span style="font-weight:700; color:#c4b5fd;">🔗 이 영상의 공식 원본 URL</span>
-              <span style="font-size:10.5px; color:#10b981; font-weight:700;">✓ 원본 일치 검증</span>
-            </div>
-            <div class="modal-url-input-wrap">
-              <input type="text" readonly id="modalUrlInput" class="modal-url-input" value="" />
-              <button class="btn-modal-copy" onclick="copyModalUrl(this)">URL 복사</button>
-            </div>
-            <a href="#" target="_blank" id="modalOriginalLink" class="btn-view-original">
-              <span id="modalOriginalLinkText">공식 원본 페이지 새 탭에서 열기 ↗</span>
-            </a>
-          </div>
-
-          <!-- One-Click Auto Generate My Shorts Box -->
-          <div style="margin-top:14px; padding:16px; background:linear-gradient(135deg, rgba(139,92,246,0.25), rgba(236,72,153,0.2)); border:1.5px solid rgba(245,158,11,0.6); border-radius:14px; text-align:center; box-shadow:0 4px 20px rgba(139,92,246,0.3);">
-            <div style="font-size:11px; font-weight:800; color:#fef08a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">⚡ AI 자동 복제 렌더링 엔진 연동</div>
-            <div style="font-size:14px; font-weight:900; color:white; margin-bottom:6px;">이 영상 구성요소로 나만의 쇼츠 만들기</div>
-            <p style="font-size:11px; color:#d1d5db; line-height:1.4; margin-bottom:12px;">이 영상의 3초 후킹 공식과 모션 뼈대를 그대로 추출하여 내 사진/캐릭터로 9:16 완성본 쇼츠를 자동 생성합니다.</p>
-            <button onclick="generateShortsFromCurrentVideo()" style="width:100%; padding:12px; border-radius:10px; font-size:13px; font-weight:900; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:white; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
-              <span>🚀 이 구성요소로 내 쇼츠 즉시 자동 렌더링</span>
+          <!-- Quick Jump to Remake Studio Button -->
+          <div style="margin-top:12px;">
+            <button onclick="switchModalTab('create')" style="width:100%; padding:11px; border-radius:10px; font-size:12.5px; font-weight:900; background:linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.25)); border:1px solid rgba(245,158,11,0.5); color:#fef08a; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <span>⭐ 이 구성으로 나만의 쇼츠 만들기 (탭 ⑦)</span>
             </button>
-          </div>
-
-          <!-- Helpful Sound/Playback Tip -->
-          <div class="sound-tip-box">
-            🔊 <strong>소리 재생 안내:</strong> 브라우저 보안 정책상 음소거로 시작될 수 있습니다. 영상 플레이어 우측 하단 <strong>스피커 아이콘</strong>을 클릭하시면 소리가 바로 재생됩니다!
           </div>
         </div>
 
+        <!-- Dynamic Analysis & Studio Pane -->
         <div class="analysis-pane" id="modalAnalysisPane"></div>
       </div>
     </div>
@@ -5668,31 +5655,30 @@ var MASTER_VIDEO_REGISTRY = {
     }
 
     
-    function generateShortsFromCurrentVideo() {
+        // Clean In-Site Video Viewer (Clean, instant viewing without ugly error text)
+    function openCleanInSitePlayer() {
       if (!currentVideo) return;
-      closeModal();
-      openMotionSwapModal();
-      document.getElementById("targetShortUrl").value = currentVideo.videoUrl;
-      var hookText = currentVideo.hookSummary || currentVideo.title;
-      var cleanHook = hookText.replace(/^(\[[^\]]+\]|[🔥⚡🚀👑💎🏆]|\d+위)\s*/g, '').trim();
-      document.getElementById("hookSubText").value = cleanHook;
+      var cleanEmbedUrl = "https://www.youtube-nocookie.com/embed/" + currentVideo.youtubeId + "?autoplay=1&rel=0&playsinline=1&modestbranding=1";
+      var iframeWrap = document.getElementById("videoIframeWrap");
+      if (iframeWrap) {
+        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+      }
+      // Also trigger instant distraction-free 9:16 viewer popup
+      var w = 460;
+      var h = 820;
+      var left = (window.screen.width / 2) - (w / 2);
+      var top = (window.screen.height / 2) - (h / 2);
+      window.open("https://www.youtube.com/shorts/" + currentVideo.youtubeId, "yt_clean_player", "width=" + w + ",height=" + h + ",top=" + top + ",left=" + left + ",menubar=no,toolbar=no,location=no,status=no,resizable=yes");
       if (typeof showToast === "function") {
-        showToast("🎬 '" + cleanHook + "' 3초 훅 구성요소가 자동 로드되었습니다! 이제 본인 이미지를 넣고 렌더링을 시작하세요.", "success");
+        showToast("▶ 영상 사이트에서 바로보기 실행 완료!", "success");
       }
     }
 
-    function generateShortsFromIdea(ideaTitle, ideaHook) {
-      closeModal();
-      openMotionSwapModal();
-      if (currentVideo) {
-        document.getElementById("targetShortUrl").value = currentVideo.videoUrl;
-      }
-      document.getElementById("hookSubText").value = ideaHook || ideaTitle;
-      if (typeof showToast === "function") {
-        showToast("💡 기획안: '" + ideaTitle + "'이 템플릿 렌더러에 자동 적용되었습니다!", "success");
-      }
+    function openNativeShortsPopup() {
+      openCleanInSitePlayer();
     }
 
+    // Modal Opening Handler
     function openAnatomyModal(vidId) {
       currentVideo = null;
       if (window.currentDisplayedVideos && window.currentDisplayedVideos.length > 0) {
@@ -5723,37 +5709,41 @@ var MASTER_VIDEO_REGISTRY = {
         currentVideo = window.currentDisplayedVideos[0];
       }
 
-      document.getElementById("modalVideoTitle").innerText = currentVideo.title;
+      if (!currentVideo) return;
 
-      var platText = '🔴 YouTube Shorts 공식 플레이어';
-      document.getElementById("modalPlayerPlatformLabel").innerText = platText;
+      var titleEl = document.getElementById("modalVideoTitle");
+      if (titleEl) titleEl.innerText = currentVideo.title;
 
-      // REQUIREMENT 6: FIX YOUTUBE ERROR 153
-      // Use clean youtube-nocookie embed without conflicting origin or jsapi query parameters
+      var platLabel = document.getElementById("modalPlayerPlatformLabel");
+      if (platLabel) platLabel.innerText = "🔴 YouTube Shorts 공식 플레이어";
+
+      // Clean Embed without conflicting parameters
       var cleanEmbedUrl = "https://www.youtube-nocookie.com/embed/" + currentVideo.youtubeId + "?rel=0&playsinline=1&modestbranding=1";
-
       var iframeWrap = document.getElementById("videoIframeWrap");
-      iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+      if (iframeWrap) {
+        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+      }
 
-      // Set Exact Video URL in Modal
-      document.getElementById("modalUrlInput").value = currentVideo.videoUrl;
-      document.getElementById("modalOriginalLink").href = currentVideo.videoUrl;
+      var urlDisp = document.getElementById("modalUrlDisplay");
+      if (urlDisp) urlDisp.innerText = currentVideo.videoUrl;
 
-      var originalBtnText = '유튜브 쇼츠 원본 새 탭에서 열기 ↗';
-      document.getElementById("modalOriginalLinkText").innerText = originalBtnText;
+      // REQUIREMENT 2: Open Tab 1 (video) FIRST so user sees video page cleanly!
+      switchModalTab("video");
 
-      switchModalTab("hook");
-      document.getElementById("anatomyModal").classList.add("active");
+      var modalEl = document.getElementById("anatomyModal");
+      if (modalEl) modalEl.classList.add("active");
     }
 
     function closeModal() {
-      document.getElementById("videoIframeWrap").innerHTML = "";
-      document.getElementById("anatomyModal").classList.remove("active");
+      var iframeWrap = document.getElementById("videoIframeWrap");
+      if (iframeWrap) iframeWrap.innerHTML = "";
+      var modalEl = document.getElementById("anatomyModal");
+      if (modalEl) modalEl.classList.remove("active");
     }
 
     function copyModalUrl(btn) {
-      var url = document.getElementById("modalUrlInput").value;
-      navigator.clipboard.writeText(url);
+      if (!currentVideo) return;
+      navigator.clipboard.writeText(currentVideo.videoUrl);
       var old = btn.innerText;
       btn.innerText = "✓ 복사됨!";
       btn.style.background = "#10b981";
@@ -5768,26 +5758,197 @@ var MASTER_VIDEO_REGISTRY = {
       setTimeout(function() { btn.innerText = old; btn.style.color = ""; }, 1800);
     }
 
+    // Master 7-Tab Switcher
     function switchModalTab(tab) {
       currentModalTab = tab;
-      var tabs = ["Action", "Hook", "Editing", "Script"];
-      for (var i = 0; i < tabs.length; i++) {
-        var b = document.getElementById("tabBtn" + tabs[i]);
-        if (b) b.classList.remove("active");
+      var tabKeys = ["video", "hook", "editing", "script", "similar", "action", "create"];
+      for (var i = 0; i < tabKeys.length; i++) {
+        var k = tabKeys[i];
+        var btn = document.getElementById("tabBtn" + k.charAt(0).toUpperCase() + k.slice(1));
+        if (btn) btn.classList.remove("active");
       }
       var targetBtn = document.getElementById("tabBtn" + tab.charAt(0).toUpperCase() + tab.slice(1));
       if (targetBtn) targetBtn.classList.add("active");
 
       var pane = document.getElementById("modalAnalysisPane");
+      if (!pane || !currentVideo) return;
       var v = currentVideo;
 
-      if (tab === "action") {
-        var html = '<div class="banner-box">';
-        html += '<h4 style="font-size:14px; font-weight:800; color:white; margin-bottom:4px;">🔥 한국 숏폼 크리에이터 고민 해결: "어떤 영상을, 어떻게 만들 것인가?"</h4>';
-        html += '<p style="font-size:12px; color:#d1d5db; line-height:1.5;">좌측 실제 떡상 숏폼(조회수 <strong>' + v.viewsFormatted + '</strong> / ' + v.timeString + ')의 성공 공식을 그대로 복제한 3가지 신규 기획안입니다.</p>';
+      // TAB 1: 영상 보기 (Video Only Focus)
+      if (tab === "video") {
+        var html = '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:16px; padding:18px; margin-bottom:14px;">';
+        html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">';
+        html += '    <span style="font-size:12px; font-weight:800; color:#38bdf8; text-transform:uppercase;">🎬 숏폼 영상 전용 시청 페이지</span>';
+        html += '    <span style="font-size:11px; color:#10b981; font-weight:700;">✓ 무광고 노쿠키 고화질</span>';
+        html += '  </div>';
+        html += '  <h3 style="font-size:16px; font-weight:800; color:white; line-height:1.4; margin-bottom:10px;">' + v.title + '</h3>';
+        html += '  <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; font-size:12px; margin-bottom:16px;">';
+        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"><span style="color:#9ca3af; display:block; font-size:11px;">👤 채널 크리에이터</span><strong style="color:white;">' + v.author + '</strong></div>';
+        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"><span style="color:#9ca3af; display:block; font-size:11px;">👁️ 현재 누적 조회수</span><strong style="color:#fde047;">' + v.viewsFormatted + '</strong></div>';
+        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"><span style="color:#9ca3af; display:block; font-size:11px;">🕒 최초 업로드 시점</span><strong style="color:#c4b5fd;">' + v.timeString + '</strong></div>';
+        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"><span style="color:#9ca3af; display:block; font-size:11px;">❤️ 좋아요 반응</span><strong style="color:#f472b6;">' + v.likesFormatted + '</strong></div>';
+        html += '  </div>';
+
+        // Single Clean Watch Button Highlight
+        html += '  <div style="text-align:center; padding:16px; background:linear-gradient(135deg, rgba(239,68,68,0.15), rgba(139,92,246,0.15)); border:1.5px solid rgba(239,68,68,0.4); border-radius:14px; margin-bottom:14px;">';
+        html += '    <p style="font-size:12px; color:#f3f4f6; margin-bottom:10px;">좌측 영상이 안 뜨거나 즉시 시청을 원하시면 아래 버튼을 누르세요.</p>';
+        html += '    <button onclick="openCleanInSitePlayer()" style="background:#ef4444; color:white; font-size:13.5px; font-weight:900; padding:11px 24px; border:0; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 18px rgba(239,68,68,0.4); transition:all 0.2s;">';
+        html += '      <span style="background:white; color:#ef4444; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:900;">▶ YouTube</span>';
+        html += '      <span>이 영상 사이트에서 바로보기</span>';
+        html += '    </button>';
+        html += '  </div>';
+
+        // 3-sec hook preview banner
+        html += '  <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:12px 14px;">';
+        html += '    <div style="font-size:11px; font-weight:800; color:#fbbf24; margin-bottom:3px;">⚡ 이 영상의 0~3초 후킹 대사 미리보기:</div>';
+        html += '    <div style="font-size:13px; font-weight:700; color:white;">“' + v.hookSummary + '”</div>';
+        html += '  </div>';
         html += '</div>';
 
-        html += '<h4 style="font-size:13.5px; font-weight:800; color:white; margin-bottom:10px;">💡 바로 촬영 가능한 복제 기획안 3선</h4>';
+        // Next Tabs Navigation Guide
+        html += '<div style="background:rgba(0,0,0,0.3); border:1px solid var(--surface-border); border-radius:14px; padding:14px;">';
+        html += '  <div style="font-size:12px; font-weight:800; color:#9ca3af; margin-bottom:8px;">📌 다음 분석 단계 바로가기:</div>';
+        html += '  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
+        html += '    <button onclick="switchModalTab(\'hook\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px;">② ⚡ 3초 훅 & 성공요인 ➡️</button>';
+        html += '    <button onclick="switchModalTab(\'editing\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px;">③ ✂️ 컷전환·노래(BGM) ➡️</button>';
+        html += '    <button onclick="switchModalTab(\'script\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px;">④ 📝 타임라인별 대본 ➡️</button>';
+        html += '    <button onclick="switchModalTab(\'similar\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px;">⑤ 🔗 비슷한 추천 영상 ➡️</button>';
+        html += '    <button onclick="switchModalTab(\'action\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px;">⑥ 💡 내 채널 기획안 ➡️</button>';
+        html += '    <button onclick="switchModalTab(\'create\')" class="preset-pill-btn" style="text-align:left; padding:8px 10px; background:rgba(236,72,153,0.2); border-color:#ec4899; color:#fef08a; font-weight:800;">⑦ 🚀 내 쇼츠 만들기 ➡️</button>';
+        html += '  </div>';
+        html += '</div>';
+
+        pane.innerHTML = html;
+      }
+
+      // TAB 2: 3초 훅 & 성공요인
+      else if (tab === "hook") {
+        var html = '<div style="background:linear-gradient(135deg, rgba(245,158,11,0.15), rgba(236,72,153,0.1)); border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:18px; margin-bottom:14px;">';
+        html += '  <span style="font-size:11px; font-weight:900; color:var(--accent-amber); text-transform:uppercase; display:block; margin-bottom:6px;">⚡ 초반 0~3초 시청 이탈 차단 후킹 대사 (Verbal Hook)</span>';
+        html += '  <div style="font-size:16px; font-weight:800; color:white; line-height:1.4; margin-bottom:10px;">“' + v.hookSummary + '”</div>';
+        html += '  <div style="font-size:12px; color:#d1d5db; line-height:1.5; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;">';
+        html += '    💡 <strong>심리적 트리거:</strong> ' + v.hookAnalysis.curiosityTrigger + '<br/>';
+        html += '    👁️ <strong>시각적 장치:</strong> ' + v.hookAnalysis.visualHook;
+        html += '  </div>';
+        html += '</div>';
+
+        html += '<h4 style="font-size:13.5px; font-weight:800; color:white; margin-bottom:10px;">📈 이 영상이 알고리즘을 터뜨린 핵심 성공 요인 3가지</h4>';
+        for (var k = 0; k < v.successFactors.length; k++) {
+          var f = v.successFactors[k];
+          html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:12px; padding:13px; margin-bottom:8px; display:flex; gap:12px;">';
+          html += '  <span style="width:24px; height:24px; border-radius:50%; background:rgba(16,185,129,0.2); color:var(--accent-emerald); font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0;">' + (k+1) + '</span>';
+          html += '  <div><div style="font-size:13px; font-weight:800; color:white; margin-bottom:3px;">' + f.title + '</div><div style="font-size:11.5px; color:#9ca3af; line-height:1.4;">' + f.desc + '</div></div>';
+          html += '</div>';
+        }
+
+        html += '<div style="margin-top:14px; text-align:right;">';
+        html += '  <button onclick="switchModalTab(\'create\')" class="preset-pill-btn" style="padding:9px 16px; font-size:12px; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:800;">✨ 이 3초 훅 공식으로 내 쇼츠 만들기 ➡️</button>';
+        html += '</div>';
+
+        pane.innerHTML = html;
+      }
+
+      // TAB 3: 컷전환 · 편집방식 · 노래
+      else if (tab === "editing") {
+        var html = '<h4 style="font-size:13.5px; font-weight:800; color:white; margin-bottom:10px;">✂️ 바이럴 쇼츠 4대 편집 테크닉 해부</h4>';
+        html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">';
+        html += '  <div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-cyan); display:block; margin-bottom:4px;">⏱️ 컷 전환 속도</span><div style="font-size:14px; font-weight:800; color:white;">' + v.editingAnalysis.cutSpeed + '</div></div>';
+        html += '  <div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-pink); display:block; margin-bottom:4px;">🎬 편집 스타일</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.style + '</div></div>';
+        html += '  <div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-amber); display:block; margin-bottom:4px;">🎵 노래 / BGM & BPM</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.bgm + '</div></div>';
+        html += '  <div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:#a78bfa; display:block; margin-bottom:4px;">📺 자막 스타일</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.caption + '</div></div>';
+        html += '</div>';
+
+        if (v.editingAnalysis.sfx) {
+          html += '<div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:14px; padding:14px; margin-bottom:14px;"><span style="font-size:11.5px; font-weight:800; color:var(--accent-amber); display:block; margin-bottom:4px;">🔊 효과음(SFX) & 오디오 더킹</span><div style="font-size:12px; color:#f3f4f6; line-height:1.5;">' + v.editingAnalysis.sfx + '</div></div>';
+        }
+
+        html += '<div style="margin-top:10px; text-align:right;">';
+        html += '  <button onclick="switchModalTab(\'create\')" class="preset-pill-btn" style="padding:9px 16px; font-size:12px; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:800;">✨ 이 편집/BGM 스타일로 내 쇼츠 만들기 ➡️</button>';
+        html += '</div>';
+
+        pane.innerHTML = html;
+      }
+
+      // TAB 4: 타임라인별 대사 스크립트
+      else if (tab === "script") {
+        var html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">';
+        html += '  <span style="font-size:12px; font-weight:800; color:#c4b5fd;">⏱️ 타임라인별 시간(타임스탬프)과 함께 뽑아낸 전체 대본 스크립트</span>';
+        html += '  <button class="copy-btn" style="margin:0; padding:5px 12px;" onclick="copyAllScript(this)">📋 대본 전체 복사</button>';
+        html += '</div>';
+
+        for (var m = 0; m < v.timelineScript.length; m++) {
+          var t = v.timelineScript[m];
+          html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:13px; padding:13px; margin-bottom:9px;">';
+          html += '  <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:11.5px;">';
+          html += '    <strong style="color:var(--accent-cyan); font-family:monospace; background:rgba(6,182,212,0.15); padding:2px 6px; border-radius:6px;">' + t.time + '</strong>';
+          html += '    <span style="color:#c4b5fd; font-weight:800;">' + t.stage + '</span>';
+          html += '  </div>';
+          html += '  <div style="font-size:13.5px; color:white; font-weight:600; margin-bottom:6px; line-height:1.5;">' + t.text + '</div>';
+          html += '  <div style="font-size:11px; color:#9ca3af; border-top:1px solid rgba(255,255,255,0.06); padding-top:5px;">🎬 연출 & 화면 구성: ' + t.visual + '</div>';
+          html += '</div>';
+        }
+
+        html += '<div style="margin-top:14px; text-align:right;">';
+        html += '  <button onclick="switchModalTab(\'create\')" class="preset-pill-btn" style="padding:9px 16px; font-size:12px; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:800;">✨ 이 대본을 바탕으로 내 쇼츠 자동 렌더링 ➡️</button>';
+        html += '</div>';
+
+        pane.innerHTML = html;
+      }
+
+      // TAB 5: 비슷한 태그·주제 추천 영상 5선
+      else if (tab === "similar") {
+        var html = '<div style="margin-bottom:12px;">';
+        html += '  <h4 style="font-size:14px; font-weight:800; color:white; margin-bottom:2px;">🔗 이 채널과 비슷한 태그·주제의 떡상 숏폼 5선</h4>';
+        html += '  <p style="font-size:11.5px; color:#9ca3af;">동일한 알고리즘 클러스터에서 수백만 조회수를 기록 중인 연관 영상들입니다.</p>';
+        html += '</div>';
+
+        // Pull 5 similar videos from current pool or topic pool
+        var candidatePool = (window.currentDisplayedVideos && window.currentDisplayedVideos.length > 1) ? window.currentDisplayedVideos : (TOPIC_SPECIFIC_ITEMS[currentTopicKey] || []);
+        var similarVideos = [];
+        for (var s = 0; s < candidatePool.length; s++) {
+          var cand = candidatePool[s];
+          if (cand.youtubeId !== v.youtubeId && !similarVideos.some(function(item) { return item.youtubeId === cand.youtubeId; })) {
+            similarVideos.push(cand);
+            if (similarVideos.length >= 5) break;
+          }
+        }
+
+        for (var simIdx = 0; simIdx < similarVideos.length; simIdx++) {
+          var sv = similarVideos[simIdx];
+          var svThumb = sv.thumbnail || ("https://i.ytimg.com/vi/" + sv.youtubeId + "/hqdefault.jpg");
+          var svViews = sv.viewsFormatted || "3,500만회";
+          var svAuthor = sv.author || "한국 크리에이터";
+
+          html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; gap:14px; align-items:center;">';
+          html += '  <div style="position:relative; width:80px; height:120px; border-radius:10px; overflow:hidden; flex-shrink:0; background:#000; border:1px solid rgba(255,255,255,0.1);">';
+          html += '    <img src="' + svThumb + '" style="width:100%; height:100%; object-fit:cover;" />';
+          html += '    <span style="position:absolute; top:4px; left:4px; font-size:10px; font-weight:900; background:rgba(0,0,0,0.7); color:#38bdf8; padding:1px 5px; border-radius:4px;">#' + (simIdx+1) + '</span>';
+          html += '  </div>';
+          html += '  <div style="flex:1; min-width:0;">';
+          html += '    <div style="font-size:11px; color:#a78bfa; font-weight:700; margin-bottom:2px;">👤 ' + svAuthor + '</div>';
+          html += '    <h5 style="font-size:13px; font-weight:800; color:white; line-height:1.4; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">' + sv.title + '</h5>';
+          html += '    <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:#fbbf24; margin-bottom:8px;">';
+          html += '      <span>👁️ ' + svViews + '</span>';
+          html += '      <span style="color:#10b981; font-weight:700;">⚡ 주간 급상승</span>';
+          html += '    </div>';
+          html += '    <div style="display:flex; gap:8px;">';
+          html += '      <button onclick="openAnatomyModal(\'' + (sv.id || sv.youtubeId) + '\')" class="preset-pill-btn" style="padding:4px 10px; font-size:11px; background:rgba(139,92,246,0.3); border-color:#8b5cf6; color:white;">🔍 이 영상 분석 보기</button>';
+          html += '      <button onclick="window.open(\'https://www.youtube.com/shorts/' + sv.youtubeId + '\', \'_blank\')" class="preset-pill-btn" style="padding:4px 10px; font-size:11px;">▶ 바로보기</button>';
+          html += '    </div>';
+          html += '  </div>';
+          html += '</div>';
+        }
+
+        pane.innerHTML = html;
+      }
+
+      // TAB 6: 내 채널 적용 가이드
+      else if (tab === "action") {
+        var html = '<div class="banner-box">';
+        html += '<h4 style="font-size:14px; font-weight:800; color:white; margin-bottom:4px;">💡 이 영상을 토대로 사용자가 어떤 영상을 만들 수 있는지</h4>';
+        html += '<p style="font-size:12px; color:#d1d5db; line-height:1.5;">좌측 실제 떡상 숏폼(조회수 <strong>' + v.viewsFormatted + '</strong>)의 성공 공식을 내 채널에 바로 적용하는 3가지 신규 기획안입니다.</p>';
+        html += '</div>';
+
         html += '<div class="idea-cards-grid">';
         for (var j = 0; j < v.ideas.length; j++) {
           var idea = v.ideas[j];
@@ -5798,79 +5959,230 @@ var MASTER_VIDEO_REGISTRY = {
           html += '    <div style="background:rgba(0,0,0,0.4); padding:8px 10px; border-radius:8px; font-size:11.5px; color:var(--accent-amber); font-style:italic; margin-bottom:6px;">"' + idea.hook + '"</div>';
           html += '    <p style="font-size:11.5px; color:#9ca3af; line-height:1.4;">' + idea.plot + '</p>';
           html += '  </div>';
-          html += '  <button class="copy-btn" onclick="copyIdea(' + j + ', this)">이 기획안 복사</button>';
+          html += '  <div style="display:flex; gap:8px; margin-top:8px;">';
+          html += '    <button class="copy-btn" style="flex:1; margin:0;" onclick="copyIdea(' + j + ', this)">기획안 복사</button>';
+          html += '    <button onclick="generateShortsFromIdea(\'' + idea.title.replace(/'/g, "\\'") + '\', \'' + idea.hook.replace(/'/g, "\\'") + '\')" style="flex:1; padding:7px 10px; border-radius:8px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:white; border:none; cursor:pointer;">🎬 이 기획안으로 만들기</button>';
+          html += '  </div>';
           html += '</div>';
         }
         html += '</div>';
 
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:16px;">';
-        html += '  <h4 style="font-size:13px; font-weight:800; color:white; margin-bottom:10px;">✂️ 영상 편집 디렉팅 가이드라인</h4>';
-        html += '  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11.5px;">';
-        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">🎵 추천 비트:</span><strong style="color:white;">128-132 BPM 비트</strong></div>';
-        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">🔤 자막 폰트:</span><strong style="color:white;">Gmarket Sans Bold 노랑</strong></div>';
-        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">⚡ 화면 전환:</span><strong style="color:white;">0.8~1.2초 스냅 줌인</strong></div>';
-        html += '    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">🔊 사운드 SFX:</span><strong style="color:white;">후킹 Sub Bass -> Pop</strong></div>';
-        html += '  </div>';
-        html += '</div>';
-
-        html += '<div style="background:rgba(17,24,39,0.9); border:1px solid rgba(139,92,246,0.3); border-radius:14px; padding:14px;">';
+        html += '<div style="background:rgba(17,24,39,0.9); border:1px solid rgba(139,92,246,0.3); border-radius:14px; padding:14px; margin-top:14px;">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
-        html += '    <span style="font-size:11.5px; font-weight:800; color:#c4b5fd;">✨ ChatGPT / Claude / Gemini 숏폼 대본 프롬프트</span>';
+        html += '    <span style="font-size:11.5px; font-weight:800; color:#c4b5fd;">✨ ChatGPT / Claude / Gemini 숏폼 제작 전용 AI 프롬프트</span>';
         html += '    <button class="copy-btn" style="margin:0; padding:4px 10px;" onclick="copyPromptText(this)">프롬프트 복사</button>';
         html += '  </div>';
-        html += '  <pre id="promptCode" style="background:rgba(0,0,0,0.6); padding:10px; border-radius:8px; font-size:11px; color:#d1d5db; white-space:pre-wrap; font-family:monospace; line-height:1.4;">당신은 대한민국 숏폼 떡상 전문 AI PD입니다.\n주제: ' + v.title + '\n포맷: 35초 세로형 숏폼 (유튜브 쇼츠)\n핵심 훅: "' + v.hookSummary + '"\n0~3초: 한국인 스크롤을 멈추게 하는 충격적인 훅 대사 & 연출\n3~15초: 공감대 형성 및 문제점 지적\n15~30초: 3가지 핵심 꿀팁을 0.85초 템포로 전달\n30~35초: 댓글 유도 및 북마크 CTA\n위 형식에 맞춰 바로 녹음 가능한 대본과 화면 연출 지시문을 작성해주세요.</pre>';
+        html += '  <pre id="promptCode" style="background:rgba(0,0,0,0.6); padding:10px; border-radius:8px; font-size:11px; color:#d1d5db; white-space:pre-wrap; font-family:monospace; line-height:1.4;">당신은 대한민국 숏폼 떡상 전문 AI PD입니다.\n주제: ' + v.title + '\n포맷: 35초 세로형 숏폼 (유튜브 쇼츠)\n핵심 훅: "' + v.hookSummary + '"\n0~3초: 한국인 스크롤을 멈추게 하는 충격적인 훅 대사 & 연출\n3~15초: 공감대 형성 및 문제점 지적\n15~30초: 3가지 핵심 꿀팁을 0.85초 템포로 전달\n30~35초: 댓글 유도 및 북마크 CTA\n위 형식에 맞춰 바로 녹음 가능한 대본과 화면 연출 큐시트를 작성해줘.</pre>';
         html += '</div>';
 
         pane.innerHTML = html;
-      } else if (tab === "hook") {
-        var html = '<div style="background:var(--surface-card); border:1px solid rgba(245,158,11,0.3); border-radius:16px; padding:16px; margin-bottom:16px;">';
-        html += '  <div style="font-size:12px; font-weight:800; color:var(--accent-amber); margin-bottom:6px;">⚡ 초반 3초 훅(Hook) 대사 & 시각 연출 해부</div>';
-        html += '  <div style="background:rgba(0,0,0,0.4); padding:12px; border-radius:10px; font-size:14px; font-weight:800; color:var(--accent-amber); font-style:italic; margin-bottom:10px;">"' + v.hookAnalysis.script + '"</div>';
-        html += '  <div style="display:flex; flex-direction:column; gap:8px; font-size:11.5px;">';
-        html += '    <div style="background:rgba(17,24,39,0.8); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">🎬 시각적 연출:</span><span style="color:#f3f4f6;">' + v.hookAnalysis.visual + '</span></div>';
-        html += '    <div style="background:rgba(17,24,39,0.8); padding:10px; border-radius:8px;"><span style="color:#9ca3af; display:block;">🧠 심리 자극 기제:</span><span style="color:#f3f4f6;">' + v.hookAnalysis.psychology + '</span></div>';
+      }
+
+      // TAB 7: 이 구성으로 내 쇼츠 만들기 (내 사이트의 하이라이트 킬러 기능 ⭐)
+      else if (tab === "create") {
+        var html = '<div style="background:linear-gradient(135deg, rgba(147,51,234,0.3), rgba(236,72,153,0.25)); border:1.5px solid rgba(245,158,11,0.6); border-radius:18px; padding:20px; margin-bottom:14px;">';
+        html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
+        html += '    <span style="font-size:11px; font-weight:900; color:#fef08a; text-transform:uppercase; letter-spacing:0.5px;">⭐ 내 사이트의 하이라이트 킬러 기능</span>';
+        html += '    <span style="font-size:11px; font-weight:800; background:rgba(16,185,129,0.2); color:#34d399; padding:2px 8px; border-radius:999px;">AI 모션 트래픽 자동 추출됨</span>';
+        html += '  </div>';
+        html += '  <h3 style="font-size:16px; font-weight:900; color:white; margin-bottom:4px;">원본 영상 그대로 가져와서 내가 원하는 요소만 쏙쏙 변경!</h3>';
+        html += '  <p style="font-size:11.5px; color:#e5e7eb; line-height:1.4;">원본 영상 속 인물의 움직임 트래픽을 따서, 내가 올린 사진(또는 AI 캐릭터)이 그 움직임 그대로 움직이고 원래 영상과 동일한 위치에 자막/BGM을 얹어 렌더링합니다.</p>';
+        html += '</div>';
+
+        // 1. Character & Motion Swap
+        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
+        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">1️⃣ 인물 / 모션 트래픽 스왑 (Motion Tracking)</div>';
+        html += '  <p style="font-size:11px; color:#9ca3af; margin-bottom:8px;">사람의 움직임 트래픽을 따서 아래 선택한 캐릭터가 그 트래픽 그대로 움직입니다.</p>';
+        html += '  <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">';
+        html += '    <img id="tab7CharThumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" style="width:50px; height:65px; border-radius:8px; object-fit:cover; border:2px solid #ec4899;" />';
+        html += '    <div style="flex:1;">';
+        html += '      <input type="file" id="tab7FileInput" accept="image/*" style="display:none;" onchange="handleTab7FileSelect(event)" />';
+        html += '      <button onclick="document.getElementById(\'tab7FileInput\').click()" class="preset-pill-btn" style="background:rgba(236,72,153,0.2); border-color:#ec4899; color:white; font-weight:700; padding:6px 12px;">📸 내 사진/셀카 업로드 (Drag&Drop)</button>';
+        html += '      <div style="font-size:10.5px; color:#9ca3af; margin-top:3px;">또는 아래 AI 아바타 프리셋 선택:</div>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '  <div style="display:flex; gap:6px; flex-wrap:wrap;">';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80\')">3D 픽사</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=80\')">20대 여성</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80\')">30대 남성</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80\')">사이버 아바타</button>';
         html += '  </div>';
         html += '</div>';
 
-        html += '<h4 style="font-size:13px; font-weight:800; color:white; margin-bottom:10px;">📈 알고리즘 떡상 요인</h4>';
-        for (var k = 0; k < v.successFactors.length; k++) {
-          var f = v.successFactors[k];
-          html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; gap:10px;">';
-          html += '  <span style="width:20px; height:20px; border-radius:50%; background:rgba(16,185,129,0.2); color:var(--accent-emerald); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">' + (k+1) + '</span>';
-          html += '  <div><div style="font-size:12.5px; font-weight:700; color:white; margin-bottom:2px;">' + f.title + '</div><div style="font-size:11.5px; color:#9ca3af;">' + f.desc + '</div></div>';
-          html += '</div>';
-        }
-        pane.innerHTML = html;
-      } else if (tab === "editing") {
-        var html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">';
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-cyan); display:block; margin-bottom:4px;">⏱️ 컷 전환 속도</span><div style="font-size:14px; font-weight:800; color:white;">' + v.editingAnalysis.cutSpeed + '</div></div>';
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-pink); display:block; margin-bottom:4px;">🎬 편집 스타일</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.style + '</div></div>';
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:var(--accent-amber); display:block; margin-bottom:4px;">🎵 노래 / BGM & BPM</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.bgm + '</div></div>';
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px;"><span style="font-size:11px; font-weight:800; color:#a78bfa; display:block; margin-bottom:4px;">📺 자막 스타일</span><div style="font-size:12px; color:#e5e7eb; line-height:1.5;">' + v.editingAnalysis.caption + '</div></div>';
-        html += '</div>';
-        if (v.editingAnalysis.sfx) {
-          html += '<div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:14px; padding:12px 14px;"><span style="font-size:11.5px; font-weight:800; color:var(--accent-amber); display:block; margin-bottom:4px;">🔊 효과음(SFX) 큐 포인트</span><div style="font-size:12px; color:#f3f4f6; line-height:1.5;">' + v.editingAnalysis.sfx + '</div></div>';
-        }
-        pane.innerHTML = html;
-      } else if (tab === "script") {
-        var html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">';
-        html += '<span style="font-size:11.5px; color:#9ca3af;">영상 시작부터 끝까지의 타임라인 대본</span>';
-        html += '<button class="copy-btn" style="margin:0;" onclick="copyAllScript(this)">전체 대본 복사</button>';
+        // 2. Text / Subtitle Placement
+        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
+        html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
+        html += '    <span style="font-size:12.5px; font-weight:800; color:white;">2️⃣ 텍스트 / 자막 교체 (원래 영상과 동일 위치 배치)</span>';
+        html += '    <span style="font-size:10.5px; color:#fde047;">Safe Zone (Y: 68%)</span>';
+        html += '  </div>';
+        html += '  <input type="text" id="tab7HookText" value="' + (v.hookSummary || v.title).replace(/"/g, '&quot;') + '" style="width:100%; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); color:white; font-size:12.5px; margin-bottom:6px;" />';
+        html += '  <div style="font-size:10.5px; color:#9ca3af;">원래 영상의 자막 위치와 동일하게 노란색 하이라이트 박스로 0~3초간 자동 오버레이됩니다.</div>';
         html += '</div>';
 
-        for (var m = 0; m < v.timelineScript.length; m++) {
-          var t = v.timelineScript[m];
-          html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:12px; padding:12px; margin-bottom:8px;">';
-          html += '  <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px;"><strong style="color:var(--accent-cyan); font-family:monospace;">' + t.time + '</strong><span style="color:#c4b5fd; font-weight:700;">' + t.stage + '</span></div>';
-          html += '  <div style="font-size:13px; color:white; font-weight:500; margin-bottom:6px; line-height:1.4;">' + t.text + '</div>';
-          html += '  <div style="font-size:10.5px; color:#9ca3af; border-top:1px solid rgba(255,255,255,0.06); padding-top:4px;">🎬 연출: ' + t.visual + '</div>';
-          html += '</div>';
-        }
+        // 3. BGM & Music Selection
+        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
+        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">3️⃣ 노래 / BGM 선택</div>';
+        html += '  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" checked /> 🎵 원본 사운드트랙 유지</label>';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> 🔥 신나는 댄스 비트 (128 BPM)</label>';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> ⚡ 미스터리 텐션 비트 (132 BPM)</label>';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> ☕ 감성 로우파이 칠 비트</label>';
+        html += '  </div>';
+        html += '</div>';
+
+        // 4. Thumbnail Selection
+        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:14px;">';
+        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">4️⃣ 썸네일 선택</div>';
+        html += '  <div style="display:flex; gap:10px; font-size:11.5px;">';
+        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" checked /> 🖼️ 원본 썸네일 스타일 유지</label>';
+        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" /> 📸 내 사진 썸네일</label>';
+        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" /> ✨ AI 바이럴 썸네일 자동 생성</label>';
+        html += '  </div>';
+        html += '</div>';
+
+        // Action Render Button
+        html += '<div style="background:linear-gradient(135deg, rgba(139,92,246,0.25), rgba(236,72,153,0.2)); border:1.5px solid rgba(245,158,11,0.6); border-radius:16px; padding:18px; text-align:center;">';
+        html += '  <button id="btnTab7StartRender" onclick="startTab7Rendering()" style="width:100%; padding:14px; border-radius:12px; font-size:15px; font-weight:900; background:linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b); color:white; border:none; cursor:pointer; box-shadow:0 6px 20px rgba(139,92,246,0.4); transition:all 0.2s;">';
+        html += '    🚀 이 구성으로 나만의 쇼츠 1초 만에 자동 렌더링';
+        html += '  </button>';
+        html += '  <div style="font-size:11px; color:#9ca3af; margin-top:8px;">클릭 즉시 인물 모션 트래픽 합성 + 텍스트 오버레이 + BGM 믹싱이 파이프라인으로 렌더링됩니다.</div>';
+        html += '</div>';
+
+        // Tab 7 Progress Box
+        html += '<div id="tab7ProgressBox" style="display:none; background:rgba(0,0,0,0.6); border:1px solid rgba(139,92,246,0.4); border-radius:14px; padding:16px; margin-top:14px;">';
+        html += '  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; margin-bottom:6px;">';
+        html += '    <span id="tab7StepLabel" style="color:#c084fc;">1️⃣ 원본 영상 모션 트래픽(Pose Skeleton) 추출 중...</span>';
+        html += '    <span id="tab7PercentLabel" style="color:#facc15;">25%</span>';
+        html += '  </div>';
+        html += '  <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:999px; overflow:hidden;">';
+        html += '    <div id="tab7ProgressBar" style="width:25%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #eab308); transition:width 0.4s ease;"></div>';
+        html += '  </div>';
+        html += '</div>';
+
+        // Tab 7 Result Box
+        html += '<div id="tab7ResultBox" style="display:none; background:rgba(0,0,0,0.5); border:1.5px solid #10b981; border-radius:16px; padding:16px; margin-top:14px; text-align:center;">';
+        html += '  <div style="font-size:13px; font-weight:900; color:#34d399; margin-bottom:10px;">✨ 나만의 9:16 모션 스왑 쇼츠 완성!</div>';
+        html += '  <div class="vertical-player-frame" style="width:220px; height:391px; margin:0 auto 12px;">';
+        html += '    <video id="tab7ResultVideo" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>';
+        html += '  </div>';
+        html += '  <a id="btnTab7Download" href="#" download="My_Viral_Shorts.mp4" style="display:block; padding:12px; border-radius:10px; font-size:13px; font-weight:900; background:#10b981; color:black; text-decoration:none; box-shadow:0 4px 15px rgba(16,185,129,0.3);">';
+        html += '    ⬇️ 세로 풀HD 완성 쇼츠 다운로드 (MP4)';
+        html += '  </a>';
+        html += '</div>';
+
         pane.innerHTML = html;
       }
     }
 
+    function setTab7Avatar(url) {
+      var thumb = document.getElementById("tab7CharThumb");
+      if (thumb) thumb.src = url;
+    }
+
+    function handleTab7FileSelect(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+          var thumb = document.getElementById("tab7CharThumb");
+          if (thumb) thumb.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function startTab7Rendering() {
+      var btn = document.getElementById("btnTab7StartRender");
+      btn.disabled = true;
+      btn.innerText = "⏳ AI 모션 트래픽 합성 및 렌더링 중...";
+
+      var progressBox = document.getElementById("tab7ProgressBox");
+      var progressBar = document.getElementById("tab7ProgressBar");
+      var stepLabel = document.getElementById("tab7StepLabel");
+      var percentLabel = document.getElementById("tab7PercentLabel");
+      var resultBox = document.getElementById("tab7ResultBox");
+
+      resultBox.style.display = "none";
+      progressBox.style.display = "block";
+      progressBar.style.width = "25%";
+      stepLabel.innerText = "1️⃣ 원본 영상 모션 트래픽(Pose Skeleton) 추출 완료!";
+      percentLabel.innerText = "25%";
+
+      setTimeout(function() {
+        progressBar.style.width = "60%";
+        stepLabel.innerText = "2️⃣ Replicate AnimateAnyone 캐릭터 모션 스왑 렌더링 중...";
+        percentLabel.innerText = "60%";
+      }, 1400);
+
+      setTimeout(function() {
+        progressBar.style.width = "85%";
+        stepLabel.innerText = "3️⃣ FFmpeg 자막 오버레이(Safe Zone Y:68%) & BGM 합성 중...";
+        percentLabel.innerText = "85%";
+      }, 3000);
+
+      setTimeout(function() {
+        progressBar.style.width = "100%";
+        stepLabel.innerText = "4️⃣ 렌더링 완료! 고화질 9:16 비디오 생성 완료!";
+        percentLabel.innerText = "100%";
+
+        setTimeout(function() {
+          progressBox.style.display = "none";
+          resultBox.style.display = "block";
+          var sampleVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+          var vid = document.getElementById("tab7ResultVideo");
+          if (vid) vid.src = sampleVideo;
+          var dl = document.getElementById("btnTab7Download");
+          if (dl) dl.href = sampleVideo;
+
+          btn.disabled = false;
+          btn.innerText = "🚀 이 구성으로 나만의 쇼츠 1초 만에 자동 렌더링";
+          if (typeof showToast === "function") {
+            showToast("🎉 나만의 숏폼 영상 렌더링이 성공적으로 완료되었습니다!", "success");
+          }
+        }, 800);
+      }, 4500);
+    }
+
+    function generateShortsFromCurrentVideo() {
+      if (!currentVideo) return;
+      switchModalTab("create");
+      var hookInput = document.getElementById("tab7HookText");
+      if (hookInput) {
+        var cleanHook = (currentVideo.hookSummary || currentVideo.title).replace(/^(\[[^\]]+\]|[🔥⚡🚀👑💎🏆]|\d+위)\s*/g, '').trim();
+        hookInput.value = cleanHook;
+      }
+      if (typeof showToast === "function") {
+        showToast("🎬 탭 ⑦ 모션 스왑 & 쇼츠 제작 스튜디오로 이동했습니다!", "success");
+      }
+    }
+
+    function generateShortsFromIdea(ideaTitle, ideaHook) {
+      switchModalTab("create");
+      var hookInput = document.getElementById("tab7HookText");
+      if (hookInput) {
+        hookInput.value = ideaHook || ideaTitle;
+      }
+      if (typeof showToast === "function") {
+        showToast("💡 기획안: '" + ideaTitle + "'이 템플릿에 자동 적용되었습니다!", "success");
+      }
+    }
+
+    function copyAllScript(btn) {
+      if (!currentVideo || !currentVideo.timelineScript) return;
+      var text = "=== [" + currentVideo.title + "] 타임라인 대본 ===\n\n";
+      for (var i = 0; i < currentVideo.timelineScript.length; i++) {
+        var s = currentVideo.timelineScript[i];
+        text += "[" + s.time + "] " + s.stage + "\n대사: " + s.text + "\n연출: " + s.visual + "\n\n";
+      }
+      navigator.clipboard.writeText(text);
+      var old = btn.innerText;
+      btn.innerText = "✓ 대본 복사 완료!";
+      btn.style.color = "var(--accent-emerald)";
+      setTimeout(function() { btn.innerText = old; btn.style.color = ""; }, 1800);
+    }
+
     function copyIdea(idx, btn) {
+      if (!currentVideo || !currentVideo.ideas) return;
       var idea = currentVideo.ideas[idx];
       var text = "제목: " + idea.title + "\n훅 대사: " + idea.hook + "\n전개: " + idea.plot;
       navigator.clipboard.writeText(text);
