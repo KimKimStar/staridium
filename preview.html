@@ -6110,53 +6110,197 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
     // Custom Keyword Search Bar with Smart Category Detection
     // Search Function: Lists ALL videos from the entire database containing the search word
+        // Enhanced Topic & Tag Registry for Deep Topic/Tag Search Matching
+    var TOPIC_TAG_REGISTRY = {
+      "total_kr": {
+        name: "대한민국 종합 숏폼 통합 랭킹",
+        keywords: ["종합", "한국", "인기", "급상승", "쇼츠", "바이럴", "떡상", "메가바이럴", "트렌드", "숏폼"],
+        tags: ["#종합", "#인기쇼츠", "#급상승", "#바이럴", "#한국쇼츠", "#떡상", "#유튜브쇼츠", "#메가바이럴", "#트렌드", "#숏폼"]
+      },
+      "psychology": {
+        name: "인간관계 & 심리 화법",
+        keywords: ["인간관계", "심리학", "대화법", "화법", "손절", "자존감", "말투", "처세술", "심리", "사회생활", "친구관계", "가스라이팅", "멘탈"],
+        tags: ["#인간관계", "#심리학", "#대화법", "#화법", "#손절", "#자존감", "#말투", "#처세술", "#심리", "#사회생활", "#친구관계", "#인간관계정리", "#멘탈관리"]
+      },
+      "humor": {
+        name: "한국 일상 공감 & 썰",
+        keywords: ["숏박스", "너덜트", "공감썰", "스케치코미디", "일상썰", "웃긴영상", "꿀잼", "현실고증", "개그", "유머", "친구", "하이퍼리얼리즘", "면허", "운전"],
+        tags: ["#숏박스", "#너덜트", "#공감썰", "#스케치코미디", "#일상썰", "#웃긴영상", "#꿀잼", "#현실고증", "#개그", "#유머", "#친구썰"]
+      },
+      "diet": {
+        name: "한국 다이어트 & 홈트",
+        keywords: ["다이어트", "홈트", "식단", "체중감량", "뱃살", "급찐급빠", "단백질", "헬스", "운동", "유산소", "칼로리", "살빼기", "복근", "체지방"],
+        tags: ["#다이어트", "#홈트", "#식단", "#체중감량", "#뱃살", "#급찐급빠", "#단백질", "#헬스", "#운동", "#유산소", "#칼로리", "#살빼기", "#다이어트식단"]
+      },
+      "finance": {
+        name: "주식 · 재테크 · 부동산",
+        keywords: ["주식", "재테크", "부동산", "비트코인", "투자", "부자", "소비", "절약", "경제", "돈버는법", "배당주", "월급관리", "파이어족", "하락장", "sqqq"],
+        tags: ["#주식", "#재테크", "#부동산", "#비트코인", "#투자", "#부자", "#소비", "#절약", "#경제", "#돈버는법", "#배당주", "#월급관리", "#파이어족"]
+      },
+      "beauty": {
+        name: "K-뷰티 · 메이크업 · 올리브영",
+        keywords: ["k뷰티", "뷰티", "메이크업", "올리브영", "올영", "화장품", "피부관리", "스킨케어", "뷰티꿀팁", "파운데이션", "립스틱", "피부"],
+        tags: ["#K뷰티", "#메이크업", "#올리브영", "#화장품", "#피부관리", "#스킨케어", "#뷰티꿀팁", "#올영세일", "#파운데이션", "#립스틱"]
+      },
+      "cooking": {
+        name: "맛집 · 편의점 · 초간단 레시피",
+        keywords: ["맛집", "편의점", "초간단레시피", "레시피", "요리", "간단요리", "집밥", "먹방", "자취요리", "계란", "계란요리", "원팬요리", "음식", "안주"],
+        tags: ["#맛집", "#편의점", "#초간단레시피", "#요리", "#간단요리", "#집밥", "#먹방", "#자취요리", "#계란요리", "#원팬요리", "#레시피"]
+      },
+      "growth": {
+        name: "자기계발 & 갓생 동기부여",
+        keywords: ["자기계발", "갓생", "동기부여", "성공", "습관", "멘탈", "시간관리", "생산성", "독서", "마인드셋", "목표달성", "루틴", "열정"],
+        tags: ["#자기계발", "#갓생", "#동기부여", "#성공", "#습관", "#멘탈", "#시간관리", "#생산성", "#독서", "#마인드셋", "#목표달성"]
+      },
+      "tech": {
+        name: "AI 툴 & 스마트폰/테크 꿀팁",
+        keywords: ["ai툴", "ai", "스마트폰", "폰", "핸드폰", "테크꿀팁", "아이폰", "갤럭시", "인공지능", "챗gpt", "설정", "앱추천", "기능", "테크"],
+        tags: ["#AI툴", "#스마트폰", "#테크꿀팁", "#아이폰", "#갤럭시", "#인공지능", "#챗GPT", "#핸드폰설정", "#아이폰꿀팁", "#갤럭시꿀팁"]
+      },
+      "fashion": {
+        name: "한국 데일리룩 & 코디",
+        keywords: ["한국데일리룩", "데일리룩", "코디", "패션", "옷잘입는법", "룩북", "체형커버", "가을코디", "미니멀룩", "남친룩", "여친룩", "니트"],
+        tags: ["#한국데일리룩", "#코디", "#패션", "#옷잘입는법", "#룩북", "#체형커버", "#가을코디", "#미니멀룩", "#남친룩", "#여친룩"]
+      },
+      "travel": {
+        name: "국내 핫플 & 가성비 여행",
+        keywords: ["국내핫플", "핫플", "가성비여행", "여행", "숙소추천", "데이트코스", "국내여행", "주말여행", "호캉스", "인생샷", "영종도", "오션뷰"],
+        tags: ["#국내핫플", "#가성비여행", "#여행", "#숙소추천", "#데이트코스", "#국내여행", "#주말여행", "#호캉스", "#인생샷"]
+      },
+      "pets": {
+        name: "반려동물 댕댕 & 냥냥이",
+        keywords: ["반려동물", "댕댕이", "냥스타그램", "강아지", "고양이", "동물", "귀여운동물", "집사", "반려견", "반려묘", "힐링", "반려"],
+        tags: ["#반려동물", "#댕댕이", "#냥스타그램", "#강아지", "#고양이", "#동물", "#귀여운동물", "#집사", "#반려견", "#반려묘"]
+      },
+      "english": {
+        name: "실전 생활영어 & 꿀팁",
+        keywords: ["실전생활영어", "영어", "생활영어", "영어회화", "원어민표현", "원어민", "영어단어", "영어공부", "미드영어", "영어발음", "꿀팁"],
+        tags: ["#실전생활영어", "#꿀팁", "#영어회화", "#원어민표현", "#영어단어", "#영어공부", "#원어민영어", "#미드영어", "#영어발음"]
+      }
+    };
+
+    // Upgraded Search Function: Extracts ALL videos by Topic & Tags, sorted strictly by View Count Descending!
     function executeCustomSearch() {
       var input = document.getElementById("customSearchInput");
       var query = input ? input.value.trim() : "";
       if (!query) {
-        alert("검색할 숏폼 키워드를 입력해주세요! (예: 다이어트, 계란, 아이폰, 올리브영, 주식, 손절 등)");
+        alert("검색할 숏폼 키워드를 입력해주세요! (예: 다이어트, 계란, 아이폰, 올리브영, 주식, 손절, 여행 등)");
         return;
       }
 
-      var qLower = query.toLowerCase();
-      var allVideos = [];
-      for (var k in TOPIC_SPECIFIC_ITEMS) {
-        var items = TOPIC_SPECIFIC_ITEMS[k] || [];
+      var qClean = query.replace(/^#+/, "").trim();
+      var qLower = qClean.toLowerCase();
+      var qTokens = qLower.split(/[\s,+#]+/).filter(Boolean);
+
+      // Collect candidate videos across all categories, pools, and registry
+      var candidateMap = {}; // key: youtubeId -> { item, catKey, tags, keywords }
+
+      for (var catKey in TOPIC_SPECIFIC_ITEMS) {
+        var items = TOPIC_SPECIFIC_ITEMS[catKey] || [];
+        var catMeta = (typeof TOPIC_TAG_REGISTRY !== "undefined" && TOPIC_TAG_REGISTRY[catKey]) ? TOPIC_TAG_REGISTRY[catKey] : null;
+        var catObj = CATEGORIES.find(function(c) { return c.key === catKey; });
+
         for (var i = 0; i < items.length; i++) {
-          if (!allVideos.some(function(x) { return x.youtubeId === items[i].youtubeId; })) {
-            allVideos.push(items[i]);
+          var it = items[i];
+          if (!candidateMap[it.youtubeId]) {
+            var allTags = (catMeta ? catMeta.tags.slice() : []);
+            var allKeywords = (catMeta ? catMeta.keywords.slice() : []);
+            if (catObj && catObj.subTopics) {
+              catObj.subTopics.forEach(function(st) { allKeywords.push(st.name.toLowerCase()); });
+            }
+            if (catObj && catObj.searchQ) {
+              catObj.searchQ.split('|').forEach(function(sq) { allKeywords.push(sq.toLowerCase()); });
+            }
+
+            candidateMap[it.youtubeId] = {
+              item: it,
+              catKey: catKey,
+              catName: catObj ? catObj.name : (catMeta ? catMeta.name : ""),
+              tags: allTags,
+              keywords: allKeywords
+            };
           }
         }
       }
 
-      // Filter all videos where title or author contains query
-      var matched = allVideos.filter(function(v) {
-        var t = (v.title || "").toLowerCase();
-        var a = (v.author || v.ytChannel || "").toLowerCase();
-        return t.indexOf(qLower) !== -1 || a.indexOf(qLower) !== -1;
-      });
+      // Check matching for every candidate video
+      var matchedVideos = [];
 
-      // If no direct substring match, match by split words
-      if (matched.length === 0) {
-        var words = qLower.split(/\s+/).filter(Boolean);
-        matched = allVideos.filter(function(v) {
-          var t = (v.title || "").toLowerCase();
-          return words.some(function(w) { return t.indexOf(w) !== -1; });
-        });
+      for (var yId in candidateMap) {
+        var entry = candidateMap[yId];
+        var item = entry.item;
+        var titleLower = (item.title || "").toLowerCase();
+        var authorLower = (item.author || item.ytChannel || "").toLowerCase();
+        var catNameLower = entry.catName.toLowerCase();
+        var catKeyLower = entry.catKey.toLowerCase();
+        var tagsLower = entry.tags.map(function(t) { return t.toLowerCase().replace(/^#+/, ""); });
+        var kwLower = entry.keywords.map(function(k) { return k.toLowerCase(); });
+
+        // Script content matching if available
+        var scriptText = "";
+        if (typeof REAL_VIDEO_SCRIPTS_DATABASE !== "undefined" && REAL_VIDEO_SCRIPTS_DATABASE[yId]) {
+          var sdb = REAL_VIDEO_SCRIPTS_DATABASE[yId];
+          scriptText = ((sdb.hook || "") + " " + (sdb.curiosity || "")).toLowerCase();
+        }
+
+        // Match criteria:
+        // 1. Full query matches in title, author, topic name, topic key, tags, keywords, or script
+        var isMatch = false;
+
+        if (titleLower.indexOf(qLower) !== -1 || authorLower.indexOf(qLower) !== -1 || catNameLower.indexOf(qLower) !== -1 || catKeyLower.indexOf(qLower) !== -1 || scriptText.indexOf(qLower) !== -1) {
+          isMatch = true;
+        } else if (tagsLower.some(function(t) { return t.indexOf(qLower) !== -1 || qLower.indexOf(t) !== -1; })) {
+          isMatch = true;
+        } else if (kwLower.some(function(k) { return k.indexOf(qLower) !== -1 || qLower.indexOf(k) !== -1; })) {
+          isMatch = true;
+        } else {
+          // Token-level matching
+          isMatch = qTokens.some(function(tok) {
+            return titleLower.indexOf(tok) !== -1 ||
+                   authorLower.indexOf(tok) !== -1 ||
+                   catNameLower.indexOf(tok) !== -1 ||
+                   catKeyLower.indexOf(tok) !== -1 ||
+                   scriptText.indexOf(tok) !== -1 ||
+                   tagsLower.some(function(t) { return t.indexOf(tok) !== -1 || tok.indexOf(t) !== -1; }) ||
+                   kwLower.some(function(k) { return k.indexOf(tok) !== -1 || tok.indexOf(k) !== -1; });
+          });
+        }
+
+        if (isMatch) {
+          matchedVideos.push(item);
+        }
       }
+
+      // Fallback: If no direct matches, fuzzy token search across all candidate titles
+      if (matchedVideos.length === 0) {
+        for (var yId2 in candidateMap) {
+          var it2 = candidateMap[yId2].item;
+          var tLower = (it2.title || "").toLowerCase();
+          if (qTokens.some(function(tok) { return tLower.indexOf(tok) !== -1; })) {
+            matchedVideos.push(it2);
+          }
+        }
+      }
+
+      // STRICT USER REQUIREMENT: Sort all extracted matching videos in order of VIEW COUNT DESCENDING!
+      matchedVideos.sort(function(a, b) {
+        var viewsA = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[a.youtubeId]) ? window.MASTER_VIDEO_REGISTRY[a.youtubeId] : 28500000;
+        var viewsB = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[b.youtubeId]) ? window.MASTER_VIDEO_REGISTRY[b.youtubeId] : 28500000;
+        return viewsB - viewsA;
+      });
 
       window.currentSpecialView = "search";
       window.currentSearchQuery = query;
-      window.SEARCH_MATCHED_VIDEOS = matched;
+      window.SEARCH_MATCHED_VIDEOS = matchedVideos;
 
       var label = document.getElementById("currentTopicLabel");
-      if (label) label.innerText = "🔍 '" + query + "' 검색 결과 (총 " + matched.length + "개 영상)";
+      if (label) label.innerText = "🔍 '" + query + "' 검색 결과 (조회수 1위~ 순위 정렬)";
 
       var wrap = document.getElementById("subTopicsWrap");
       if (wrap) wrap.style.display = "none";
 
       renderVideos();
-      showToast("🔍 '" + query + "' 관련 영상 총 " + matched.length + "개를 찾았습니다! (조회수 순 정렬)", "success");
+      showToast("🔍 '" + query + "' 주제·태그 매칭 영상 총 " + matchedVideos.length + "개를 조회수 순서대로 추출했습니다!", "success");
     }
 
     function setTimeFilter(filter, btn) {
@@ -6360,13 +6504,21 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
           if (countStatusEl2) countStatusEl2.innerText = "🚀 [전용관] 최근 1주일 역주행 떡상 TOP 랭킹 (총 " + list.length + "개)";
         } else if (window.currentSpecialView === "search") {
           var matchedItems = window.SEARCH_MATCHED_VIDEOS || [];
+
+          // STRICT REQUIREMENT: Sort strictly by master views descending
+          matchedItems.sort(function(a, b) {
+            var viewsA = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[a.youtubeId]) ? window.MASTER_VIDEO_REGISTRY[a.youtubeId] : 28500000;
+            var viewsB = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[b.youtubeId]) ? window.MASTER_VIDEO_REGISTRY[b.youtubeId] : 28500000;
+            return viewsB - viewsA;
+          });
+
           list = matchedItems.map(function(item, idx) {
             var masterViews = (window.MASTER_VIDEO_REGISTRY && window.MASTER_VIDEO_REGISTRY[item.youtubeId]) ? window.MASTER_VIDEO_REGISTRY[item.youtubeId] : 28500000;
             var surgeBonus = Math.floor(100000 + ((idx * 17) % 55) * 10000);
             var analysis = generateDetailedVideoAnalysis(item, "total_kr", idx + 1, "1y", window.currentSearchQuery);
             return {
               id: "search-" + item.youtubeId,
-              rank: idx + 1,
+              rank: idx + 1, // #1 rank is strictly the video with highest view count!
               title: item.title,
               platform: 'shorts',
               subTopicId: "all",
@@ -6386,7 +6538,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
               surgeScore: 850 - (idx * 5),
               viralScore: Math.max(88, 99 - Math.floor(idx / 8)),
               hookSummary: analysis.hookSummary,
-              viralReason: "🔍 '" + window.currentSearchQuery + "' 키워드 매칭 떡상 숏폼",
+              viralReason: "🔍 '" + window.currentSearchQuery + "' 주제·태그 매칭 (조회수 #" + (idx + 1) + "위)",
               hookAnalysis: analysis.hookAnalysis,
               editingAnalysis: analysis.editingAnalysis,
               timelineScript: analysis.timelineScript,
@@ -6395,7 +6547,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
             };
           });
           var countStatusEl3 = document.getElementById("countStatus");
-          if (countStatusEl3) countStatusEl3.innerText = "🔍 '" + window.currentSearchQuery + "' 검색 결과 목록 (총 " + list.length + "개)";
+          if (countStatusEl3) countStatusEl3.innerText = "🔍 '" + window.currentSearchQuery + "' 주제·태그 검색 결과 (총 " + list.length + "개 / 조회수 1위~ 순위 정렬)";
         } else {
           // Standard Category View
           var generated = generateVideosForFilter(currentTopicKey, activeTimeFilter, activePlatform, activeSubId, activeSurgeFilter, activeSort, currentDisplayLimit);
