@@ -2039,14 +2039,6 @@
         </div>
 
         <div class="header-actions">
-          <!-- 1-Hour Auto Refresh Widget with Live Countdown -->
-          <div class="refresh-widget">
-            <span class="refresh-dot"></span>
-            <span>1시간 자동 갱신:</span>
-            <strong id="timerDisplay" style="color:#34d399; font-family:monospace;">59:59</strong>
-            <button class="btn-manual-refresh" onclick="rebalanceAllVideosHourly(true)" title="1시간 주기 조회수 변동 비교 및 전 영상 순위 리밸런싱">🔄 1시간 순위 리밸런싱</button>
-          </div>
-
           <!-- YouTube API Key Modal Trigger -->
           <button class="btn-api-key" onclick="openApiModal()">
             <span class="api-status-dot" id="apiStatusDot"></span>
@@ -2260,7 +2252,7 @@
           <li>✓ 최근 1년 · 6개월 · 3개월 · 1달 · 1주 · 당일 기간별 랭킹 필터</li>
           <li>✓ 24시간 및 1주일 실시간 급상승 떡상 영상 TOP</li>
           <li>✓ 실제 유튜브 쇼츠 임베드 영상 인라인 실시간 재생</li>
-          <li>✓ 1시간 간격 실시간 자동 데이터 갱신 시스템</li>
+          <li>✓ 실시간 트렌드 데이터 자동 동기화 시스템</li>
           <li>✓ 내 채널 맞춤형 떡상 기획안 3선 & 컷 편집 템플릿 무제한 복사</li>
         </ul>
       </div>
@@ -6580,7 +6572,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       renderVideos();
 
       if (isManual) {
-        showToast("✨ 1시간 주기 완료! [최근 24시간 폭증 TOP] 및 [1주일 역주행 TOP] 전용관과 모든 카테고리 순위가 최신 조회수 기준 리밸런싱되었습니다.", "success");
+        showToast("✨ 최신 데이터 동기화 완료: 실시간 트렌드 및 순위가 업데이트되었습니다.", "success");
       }
     }
 
@@ -7314,7 +7306,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
           var platLabel = '🔴 YouTube Shorts';
           var platTagClass = 'tag-shorts';
 
-          var newBadge = v.isNewlyEmerged ? '<div class="new-emerged-badge">🌟 1시간 신규 진입</div>' : '';
+          var newBadge = '';
           var surgeIncrease = v.surgeViews24h ? Math.floor(v.surgeViews24h / 10000) : Math.floor(12 + ((i * 7) % 35));
           var surgeBadge = '<div class="surge-rate-badge">⚡ 오늘 +' + surgeIncrease + '만회 (' + v.surge1d + ')</div>';
 
@@ -8063,7 +8055,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
         var mins = Math.floor(refreshSecondsLeft / 60);
         var secs = refreshSecondsLeft % 60;
         var display = (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
-        document.getElementById("timerDisplay").innerText = display;
+        var timerEl = document.getElementById("timerDisplay"); if (timerEl) timerEl.innerText = display;
       }, 1000);
     }
 
@@ -8103,11 +8095,11 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       isSyncingHourly = true;
       var status = document.getElementById("countStatus");
       if (status) {
-        status.innerText = "🔄 1시간 정기 데이터 동기화 중...";
+        status.innerText = "🔄 실시간 데이터 동기화 중...";
         status.style.color = "var(--accent-emerald)";
       }
       if (isManual) {
-        showToast("🔄 1시간 정기 업데이트: 최신 유튜브 조회수를 갱신 중입니다...", "info");
+        showToast("🔄 데이터 동기화: 최신 유튜브 조회수를 갱신 중입니다...", "info");
       }
 
       try {
@@ -8129,7 +8121,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
         refreshSecondsLeft = 3600;
         renderVideos();
         if (isManual) {
-          showToast("✅ 1시간 동기화 완료! 앞으로 1시간 동안 저장된 조회수로 즉시 표시됩니다.", "success");
+          showToast("✅ 데이터 동기화 완료! 최신 조회수가 반영되었습니다.", "success");
         }
       } catch(err) {
         console.error("Hourly sync error:", err);
