@@ -13,32 +13,28 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      /* Silicon Valley Dark Mode Palette (Slate-950 Base & Slate-800 Cards) */
-      --bg: #020617; /* Slate-950 */
-      --surface: #0f172a; /* Slate-900 */
-      --surface-card: #1e293b; /* Slate-800 */
-      --surface-card-hover: #243247;
-      --surface-border: #334155; /* Slate-700 */
-      --surface-border-subtle: rgba(51, 65, 85, 0.6);
-      /* Primary Point Colors: Neon Blue & Violet */
-      --primary: #3b82f6; /* Neon Blue-500 */
-      --primary-hover: #2563eb;
-      --primary-glow: rgba(59, 130, 246, 0.4);
-      --violet: #8b5cf6; /* Neon Violet-500 */
-      --violet-hover: #7c3aed;
-      --violet-glow: rgba(139, 92, 246, 0.4);
-      --accent-pink: #ec4899;
-      --accent-cyan: #06b6d4;
-      --accent-amber: #f59e0b;
-      --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --sidebar-width: 290px;
+      /* Ultra-Minimalist Linear & Vercel Slate Palette */
+      --bg: #030712; /* Slate-950 deep monochromatic base */
+      --surface: #080c16; /* Clean elevated surface */
+      --surface-card: rgba(255, 255, 255, 0.02); /* Minimalist card bg */
+      --surface-card-hover: rgba(255, 255, 255, 0.04);
+      --surface-border: rgba(255, 255, 255, 0.08); /* border-white/10 */
+      --surface-border-hover: rgba(255, 255, 255, 0.2);
+
+      /* Single Point Color: Refined Subtle Violet-500 */
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --accent-subtle: rgba(139, 92, 246, 0.12);
+      --accent-border: rgba(139, 92, 246, 0.35);
+
+      /* Monochrome Typography */
+      --text-main: #f9fafb; /* Clean White */
+      --text-muted: #9ca3af; /* Gray-400 */
+      --text-dim: #6b7280; /* Gray-500 */
+      --sidebar-width: 270px;
     }
     body {
-      background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12) 0%, rgba(15, 23, 42, 0.6) 40%, #020617 100%), #020617;
+      background: #030712;
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
       min-height: 100vh;
       color: var(--text-main);
@@ -1332,6 +1328,325 @@
       padding: 10px;
     }
 
+  
+    /* Vercel & Linear Minimalist Controls & Dropdown */
+    .minimal-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 14px 0 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .control-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .status-summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8b5cf6;
+    }
+    .control-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .minimal-select-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .select-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #9ca3af;
+    }
+    .minimal-select {
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f9fafb;
+      border-radius: 8px;
+      padding: 7px 30px 7px 12px;
+      font-size: 12.5px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color 0.15s ease;
+    }
+    .minimal-select:hover, .minimal-select:focus {
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+    .minimal-select optgroup {
+      background: #0a0e1a;
+      color: #9ca3af;
+      font-weight: 700;
+    }
+    .minimal-select option {
+      background: #0a0e1a;
+      color: #f9fafb;
+      font-weight: 500;
+      padding: 4px;
+    }
+
+    /* Minimalist Video Card & Grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 28px;
+      margin-bottom: 40px;
+    }
+    .video-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+      position: relative;
+    }
+    .video-card:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.035);
+    }
+    .thumbnail-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9/13;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: #060911;
+      cursor: pointer;
+    }
+    .thumbnail-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      background: #060911;
+    }
+    .video-card:hover .thumbnail-img {
+      transform: scale(1.03);
+    }
+    .rank-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f9fafb;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      z-index: 3;
+    }
+    .surge-rate-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      z-index: 3;
+    }
+    .play-btn-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #8b5cf6;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      padding-left: 3px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    }
+    .play-overlay-text {
+      color: white;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 3px 9px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .upload-time-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      color: #9ca3af;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-weight: 500;
+    }
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #f9fafb;
+      line-height: 1.45;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .card-title:hover {
+      color: #c4b5fd;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+    .card-hook-preview {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .card-hook-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a78bfa;
+      margin-bottom: 3px;
+    }
+    .card-hook-text {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #e5e7eb;
+      line-height: 1.4;
+    }
+    .btn-card-hook-primary {
+      width: 100%;
+      padding: 9px 14px;
+      border-radius: 8px;
+      background: #8b5cf6;
+      color: white;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .btn-card-hook-primary:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+    }
+    .category-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #9ca3af;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .category-pill:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f9fafb;
+    }
+    .category-pill.active {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.45);
+      color: #f9fafb;
+      font-weight: 600;
+    }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #060911;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .sidebar-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .sidebar-item {
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-weight: 500;
+      font-size: 12.5px;
+    }
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #f9fafb;
+    }
+    .sidebar-item.active {
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: #f9fafb;
+      font-weight: 600;
+    }
+    .btn-upgrade {
+      background: #8b5cf6;
+      border: 0;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+    .btn-upgrade:hover {
+      background: #7c3aed;
+    }
+    .btn-clean-yt-watch {
+      background: #8b5cf6 !important;
+      color: white !important;
+      border: 0 !important;
+      border-radius: 8px !important;
+      padding: 8px 16px !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35) !important;
+    }
+    .btn-clean-yt-watch:hover {
+      background: #7c3aed !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1406,63 +1721,49 @@
           <button style="background:none; border:none; color:inherit; cursor:pointer;" onclick="hideToast()">✕</button>
         </div>
 
-        <!-- Period & Viral Surge Multi Filter Bar -->
-        <div class="time-filter-section">
-          <!-- Row 1: 시기별 누적 조회수 순위 (1년 전체, 6개월, 3개월, 1달, 1주, 오늘) -->
-          <div class="filter-row">
-            <div class="filter-group-title">
-              <span>📅</span>
-              <span>시기별 누적 조회수 순위 (클릭 시 기간 맞춤 랭킹):</span>
+        <!-- Ultra-Minimalist Control Bar (Vercel & Linear Style) -->
+        <div class="minimal-control-bar">
+          <div class="control-bar-left">
+            <div class="status-summary">
+              <span class="status-dot"></span>
+              <span class="count-status" id="countStatus">실시간 랭킹 (총 30개)</span>
             </div>
-            <div class="btn-group">
-              <button class="t-btn active" onclick="setTimeFilter('1y', this)">최근 1년 전체</button>
-              <button class="t-btn" onclick="setTimeFilter('6m', this)">최근 6개월</button>
-              <button class="t-btn" onclick="setTimeFilter('3m', this)">최근 3개월</button>
-              <button class="t-btn" onclick="setTimeFilter('1m', this)">최근 1달</button>
-              <button class="t-btn" onclick="setTimeFilter('1w', this)">최근 1주</button>
-              <button class="t-btn" onclick="setTimeFilter('1d', this)">오늘 (당일 실시간)</button>
-            </div>
+            <!-- SubTopics Tabs in clean minimal style -->
+            <div class="subtopics-wrap" id="subTopicsWrap" style="margin-bottom:0; padding-bottom:0;"></div>
           </div>
 
-          <!-- Row 2: 급격한 조회수 상승 순위 (1일 급상승, 1주 급상승) -->
-          <div class="filter-row" style="border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
-            <div class="filter-group-title" style="color:#f87171;">
-              <span>⚡</span>
-              <span>실시간 알고리즘 폭발 (급상승 순위):</span>
-            </div>
-            <div class="btn-group">
-              <button class="t-btn surge-btn" id="btnSurge24h" onclick="openDedicatedSurgePage('surge_24h', this)">
-                🔥 최근 24시간 조회수 폭증 TOP (전용관)
-              </button>
-              <button class="t-btn surge-btn" id="btnSurge7d" onclick="openDedicatedSurgePage('surge_7d', this)">
-                🚀 최근 1주일 역주행 떡상 TOP (전용관)
-              </button>
-              <button class="t-btn" id="btnSurgeReset" onclick="exitDedicatedSurgePage(this)">
-                ✕ 일반 카테고리 랭킹 복귀
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SubTopics Tabs -->
-        <div class="subtopics-wrap" id="subTopicsWrap"></div>
-
-        <!-- Platform Tabs & Stats Controls -->
-        <div class="filters-row">
-          <div class="platform-tabs">
-            <div class="p-tab active" style="cursor:default; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; display:flex; align-items:center; gap:8px; font-weight:700;">
-              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444; box-shadow:0 0 10px #ef4444;"></span>
-              <span>🔴 YouTube Data API v3 공식 실시간 조회수 100% 반영</span>
-            </div>
-          </div>
-
-          <div style="display:flex; align-items:center; gap:12px;">
-            <span class="count-status" id="countStatus">총 75개 세로형 숏폼 랭킹 정렬 완료</span>
-            <select class="sort-select" id="sortSelect" onchange="changeSort(this.value)">
+          <div class="control-bar-right">
+            <!-- Hidden native select for sort compatibility -->
+            <select id="sortSelect" style="display:none;" onchange="renderVideos()">
               <option value="views">조회수 높은 순 (1위~순서대로)</option>
               <option value="surge">⚡ 급상승 상승률 순 (하루 10만+ 폭증)</option>
               <option value="score">AI 바이럴 스코어 순</option>
             </select>
+
+            <!-- Single Sleek Dropdown Filter (Requirement 3: Unified Select Menu) -->
+            <div class="minimal-select-container">
+              <label class="select-label" for="unifiedFilterSelect">기간 · 정렬</label>
+              <select id="unifiedFilterSelect" class="minimal-select" onchange="handleUnifiedFilterChange(this.value)">
+                <optgroup label="📅 시기별 누적 순위">
+                  <option value="1y" selected>최근 1년 전체 랭킹</option>
+                  <option value="6m">최근 6개월 랭킹</option>
+                  <option value="3m">최근 3개월 랭킹</option>
+                  <option value="1m">최근 1달 랭킹</option>
+                  <option value="1w">최근 1주 랭킹</option>
+                  <option value="1d">오늘 (실시간 랭킹)</option>
+                </optgroup>
+                <optgroup label="⚡ 알고리즘 급상승 순위">
+                  <option value="surge_rate">🔥 급상승 상승률 순 (1일 10만+)</option>
+                  <option value="surge_24h">⚡ 최근 24시간 조회수 폭증 TOP (전용관)</option>
+                  <option value="surge_7d">🚀 최근 1주일 역주행 떡상 TOP (전용관)</option>
+                </optgroup>
+                <optgroup label="↕️ 부가 정렬 기준">
+                  <option value="views">누적 조회수 높은 순</option>
+                  <option value="surge">급상승 떡상 순</option>
+                  <option value="score">AI 바이럴 스코어 순</option>
+                </optgroup>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -1502,7 +1803,7 @@
         <button class="m-tab-btn" id="tabBtnScript" onclick="switchModalTab('script')">④ 📝 실제 대사 · 화면 글씨 스크립트</button>
         <button class="m-tab-btn" id="tabBtnSimilar" onclick="switchModalTab('similar')">⑤ 🔗 비슷한 태그·주제 추천 5선</button>
         <button class="m-tab-btn" id="tabBtnAction" onclick="switchModalTab('action')">⑥ 💡 내 채널 적용 가이드</button>
-        <button class="m-tab-btn" id="tabBtnCreate" onclick="switchModalTab('create')" style="background:linear-gradient(135deg, #8b5cf6, #ec4899); color:#fef08a; font-weight:900; border:1px solid #f59e0b; box-shadow:0 0 14px rgba(236,72,153,0.45);">⑦ 🚀 이 구성으로 내 쇼츠 만들기 ⭐</button>
+        <button class="m-tab-btn" id="tabBtnCreate" onclick="switchModalTab('create')" style="background:rgba(139, 92, 246, 0.15); color:#f9fafb; font-weight:600; border:1px solid rgba(139, 92, 246, 0.4);">⑦ 🚀 이 구성으로 내 쇼츠 만들기 ⭐</button>
       </div>
 
       <!-- Modal Body Split: Left Video Pane, Right Dynamic Content Pane -->
@@ -1510,8 +1811,8 @@
         <div class="video-player-pane">
           <!-- Clean Header with Direct YouTube Watch Button -->
           <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:10px;">
-            <button type="button" class="btn-clean-yt-watch" onclick="openCleanInSitePlayer()" style="background:#ef4444; color:white; font-size:12px; font-weight:800; padding:8px 16px; border:0; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 12px rgba(239,68,68,0.35); transition:all 0.2s;">
-              <span style="background:white; color:#ef4444; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:900;">▶ YouTube</span>
+            <button type="button" class="btn-clean-yt-watch" onclick="openCleanInSitePlayer()" style="background:#8b5cf6; color:white; font-size:12px; font-weight:600; padding:8px 16px; border:0; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(139,92,246,0.3); transition:background 0.15s;">
+              <span style="font-weight:700;">▶ YouTube</span>
               <span>이 영상 사이트에서 바로보기</span>
             </button>
           </div>
@@ -5432,6 +5733,8 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
     // Open Dedicated Surge Page
     function openDedicatedSurgePage(mode, btn) {
+      var selEl = document.getElementById("unifiedFilterSelect");
+      if (selEl) selEl.value = mode;
       window.currentSpecialView = mode;
       var buttons = document.querySelectorAll(".time-filter-section .surge-btn");
       for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
@@ -5455,6 +5758,8 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
     // Exit Dedicated Surge Page
     function exitDedicatedSurgePage(btn) {
       window.currentSpecialView = null;
+      var selEl = document.getElementById("unifiedFilterSelect");
+      if (selEl) selEl.value = (typeof activeTimeFilter !== "undefined" ? activeTimeFilter : "1y");
       var buttons = document.querySelectorAll(".time-filter-section .surge-btn");
       for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
 
@@ -5886,6 +6191,8 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
     // Surge Velocity Filter: surge_1d, surge_1w
     function setSurgeFilter(filter, btn) {
+      var selEl = document.getElementById("unifiedFilterSelect");
+      if (selEl) selEl.value = "surge_rate";
       activeSurgeFilter = filter;
       var buttons = document.querySelectorAll(".time-filter-section .surge-btn");
       for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
@@ -6141,36 +6448,35 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
           var realThumb = v.thumbnail || ("https://i.ytimg.com/vi/" + v.youtubeId + "/hqdefault.jpg");
 
           html += '<div class="video-card">';
-          html += '  <div class="rank-badge">#' + (i + 1) + '</div>';
-          html += '  <div class="surge-rate-badge">🔥 ' + v.viewsFormatted + '</div>';
           html += '  <div>';
           html += '    <div class="thumbnail-wrap" onclick="openAnatomyModal(\'' + v.id + '\')">';
+          html += '      <div class="rank-badge">#' + (i + 1) + '</div>';
+          html += '      <div class="surge-rate-badge">' + v.viewsFormatted + '</div>';
           var fallbackPoster = getSvgPosterDataUri(v.title, v.author, v.platform, i);
           html += '      <img src="' + realThumb + '" referrerpolicy="no-referrer" class="thumbnail-img" alt="' + v.title.replace(/"/g, '&quot;') + '" onerror="if(this.dataset.tried!=\'1\'){this.dataset.tried=\'1\';this.src=\'https://img.youtube.com/vi/' + v.youtubeId + '/mqdefault.jpg\';}else{this.onerror=null;this.src=\'' + fallbackPoster + '\';}" />';
-          html += '      <div class="play-overlay-icon">';
+          html += '      <div class="play-overlay-icon" onclick="playVideoDirectly(\'' + v.id + '\', event)">';
           html += '        <div class="play-btn-circle">▶</div>';
-          html += '        <span class="play-overlay-text">분석 및 재생</span>';
+          html += '        <span class="play-overlay-text">바로 재생</span>';
           html += '      </div>';
-          html += '      <div class="upload-time-badge">🕒 ' + v.timeString + '</div>';
+          html += '      <div class="upload-time-badge">' + v.timeString + '</div>';
           html += '    </div>';
+
+          html += '    <h3 class="card-title" onclick="openAnatomyModal(\'' + v.id + '\')">' + v.title + '</h3>';
 
           html += '    <div class="card-meta">';
           html += '      <span class="author-name" title="' + v.author + '">👤 ' + v.author + '</span>';
-          html += '      <div><span class="views" style="color:#60a5fa; font-weight:800;">' + v.viewsFormatted + '</span><span style="margin-left:6px; color:#f472b6;">❤️ ' + v.likesFormatted + '</span></div>';
+          html += '      <div><span class="views">' + v.viewsFormatted + '</span><span style="margin-left:8px;">❤️ ' + v.likesFormatted + '</span></div>';
           html += '    </div>';
 
-          html += '    <h3 class="card-title" onclick="openAnatomyModal(\'' + v.id + '\')" style="font-size:14px; font-weight:800; line-height:1.4; margin-bottom:8px;">' + v.title + '</h3>';
-
-          html += '    <div class="card-hook-preview" style="background:rgba(15,23,42,0.85); border:1px solid rgba(59,130,246,0.3); border-radius:10px; padding:9px 11px; margin-bottom:6px;">';
-          html += '      <div class="card-hook-label" style="font-size:10.5px; font-weight:800; color:#60a5fa; margin-bottom:2px;">⚡ 3초 훅 실제 대사:</div>';
-          html += '      <div class="card-hook-text" style="font-size:12px; font-weight:700; color:#f1f5f9; line-height:1.4;">' + v.hookSummary + '</div>';
+          html += '    <div class="card-hook-preview">';
+          html += '      <div class="card-hook-label">⚡ 3초 훅 실제 대사:</div>';
+          html += '      <div class="card-hook-text">“' + v.hookSummary + '”</div>';
           html += '    </div>';
           html += '  </div>';
 
           html += '  <div class="card-footer">';
-          html += '    <span class="viral-reason">' + v.viralReason + '</span>';
           html += '    <button class="btn-card-hook-primary" onclick="event.stopPropagation(); openAnatomyModal(\'' + v.id + '\')">';
-          html += '      <span>⚡ 3초 후킹 대사 보기</span>';
+          html += '      <span>⚡ 3초 훅 & 분석 보기</span>';
           html += '      <span style="font-size:11px;">↗</span>';
           html += '    </button>';
           html += '  </div>';
@@ -6203,21 +6509,52 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
     
         // Clean In-Site Video Viewer (Clean, instant viewing without ugly error text)
+    // Direct Play Failsafe: Guarantees Shorts play immediately without Error 153
+    function playVideoDirectly(vidId, e) {
+      if (e) {
+        e.stopPropagation();
+      }
+      openAnatomyModal(vidId);
+      openCleanInSitePlayer();
+    }
+
+    // Unified Dropdown Filter Handler (Requirement 3: Clean Single Dropdown)
+    function handleUnifiedFilterChange(val) {
+      if (!val) return;
+      if (val === "surge_24h") {
+        openDedicatedSurgePage("surge_24h");
+      } else if (val === "surge_7d") {
+        openDedicatedSurgePage("surge_7d");
+      } else if (val === "surge_rate") {
+        setSurgeFilter("rate", null);
+      } else if (val === "views_desc" || val === "likes_desc" || val === "recent") {
+        var sortEl = document.getElementById("sortSelect");
+        if (sortEl) sortEl.value = val;
+        renderVideos();
+      } else {
+        if (window.currentSpecialView) {
+          exitDedicatedSurgePage();
+        }
+        setTimeFilter(val, null);
+      }
+    }
+
     function openCleanInSitePlayer() {
       if (!currentVideo) return;
-      var cleanEmbedUrl = "https://www.youtube-nocookie.com/embed/" + currentVideo.youtubeId + "?autoplay=1&rel=0&playsinline=1&modestbranding=1";
+      // Use standard youtube.com embed with autoplay & playsinline
+      var cleanEmbedUrl = "https://www.youtube.com/embed/" + currentVideo.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
       var iframeWrap = document.getElementById("videoIframeWrap");
       if (iframeWrap) {
-        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
       }
-      // Also trigger instant distraction-free 9:16 viewer popup
-      var w = 460;
+      // Also open distraction-free 9:16 viewer popup for guaranteed playback
+      var w = 450;
       var h = 820;
       var left = (window.screen.width / 2) - (w / 2);
       var top = (window.screen.height / 2) - (h / 2);
       window.open("https://www.youtube.com/shorts/" + currentVideo.youtubeId, "yt_clean_player", "width=" + w + ",height=" + h + ",top=" + top + ",left=" + left + ",menubar=no,toolbar=no,location=no,status=no,resizable=yes");
       if (typeof showToast === "function") {
-        showToast("▶ 영상 사이트에서 바로보기 실행 완료!", "success");
+        showToast("▶ 숏폼 영상 사이트에서 바로보기 실행 완료!", "success");
       }
     }
 
@@ -6264,17 +6601,17 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       var platLabel = document.getElementById("modalPlayerPlatformLabel");
       // Clean view: technical player labels removed
 
-      // Clean Embed without conflicting parameters
-      var cleanEmbedUrl = "https://www.youtube-nocookie.com/embed/" + currentVideo.youtubeId + "?rel=0&playsinline=1&modestbranding=1";
+      // High-compatibility YouTube Embed without Error 153 cookie blockage
+      var cleanEmbedUrl = "https://www.youtube.com/embed/" + currentVideo.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
       var iframeWrap = document.getElementById("videoIframeWrap");
       if (iframeWrap) {
-        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
       }
 
       var urlDisp = document.getElementById("modalUrlDisplay");
       if (urlDisp) urlDisp.innerText = currentVideo.videoUrl;
 
-      // REQUIREMENT 2: Open Tab 1 (video) FIRST so user sees video page cleanly!
+      // Open Tab 1 (video) FIRST so user sees video page cleanly
       switchModalTab("video");
 
       var modalEl = document.getElementById("anatomyModal");
@@ -6336,11 +6673,10 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
         html += '    <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.6); padding:10px 12px; border-radius:12px;"><span style="color:#94a3b8; display:block; font-size:11px; margin-bottom:2px;">❤️ 좋아요 반응</span><strong style="color:#f472b6; font-size:13px;">' + v.likesFormatted + '</strong></div>';
         html += '  </div>';
 
-        // Clean Prominent Watch Button
-        html += '  <div style="text-align:center; padding:16px; background:linear-gradient(135deg, rgba(239,68,68,0.12), rgba(59,130,246,0.12)); border:1px solid rgba(239,68,68,0.35); border-radius:14px; margin-bottom:14px;">';
-        html += '    <button onclick="openCleanInSitePlayer()" style="background:#ef4444; color:white; font-size:14px; font-weight:900; padding:12px 28px; border:0; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 18px rgba(239,68,68,0.4); transition:all 0.2s;">';
-        html += '      <span style="background:white; color:#ef4444; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:900;">▶ YouTube</span>';
-        html += '      <span>이 영상 사이트에서 바로보기</span>';
+        // Clean Prominent Watch Button (Violet-500 Minimal)
+        html += '  <div style="text-align:center; padding:16px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:14px;">';
+        html += '    <button onclick="openCleanInSitePlayer()" style="background:#8b5cf6; color:white; font-size:13.5px; font-weight:600; padding:10px 22px; border:0; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 10px rgba(139,92,246,0.3); transition:background 0.15s;">';
+        html += '      <span>▶ YouTube 이 영상 사이트에서 바로보기</span>';
         html += '    </button>';
         html += '  </div>';
 
