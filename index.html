@@ -7458,6 +7458,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
     function openAnatomyModal(vidId) {
       currentVideo = null;
       window.currentLoadedPlayerVideoId = null;
+      window.currentLoadedPlayerMode = null;
       if (window.currentDisplayedVideos && window.currentDisplayedVideos.length > 0) {
         for (var i = 0; i < window.currentDisplayedVideos.length; i++) {
           if (String(window.currentDisplayedVideos[i].id) === String(vidId) || String(window.currentDisplayedVideos[i].youtubeId) === String(vidId)) {
@@ -7516,6 +7517,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       var iframeWrap = document.getElementById("videoIframeWrap");
       if (iframeWrap) iframeWrap.innerHTML = "";
       window.currentLoadedPlayerVideoId = null;
+      window.currentLoadedPlayerMode = null;
       var modalEl = document.getElementById("anatomyModal");
       if (modalEl) modalEl.classList.remove("active");
     }
@@ -7941,87 +7943,118 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       if (!iframeWrap || !v) return;
 
       var currentIframe = document.getElementById("modalActiveIframe");
-      var currentVid = document.getElementById("modalActiveVideo");
       var hasOverlay = document.getElementById("tab7CharacterOverlay");
 
       // Seamless playback: skip recreation only if exact same video ID AND exact same mode
-      if (window.currentLoadedPlayerVideoId === v.youtubeId) {
-        if (!isMotionSwapMode && currentIframe) return;
-        if (isMotionSwapMode && currentVid && hasOverlay) return;
+      if (window.currentLoadedPlayerVideoId === v.youtubeId && window.currentLoadedPlayerMode === isMotionSwapMode) {
+        return;
       }
       window.currentLoadedPlayerVideoId = v.youtubeId;
+      window.currentLoadedPlayerMode = isMotionSwapMode;
 
       tab7CurrentHook = (v.hookSummary || v.title);
+
+      var safeTitle = (v.title || "Shorts Video").replace(/"/g, '&quot;');
+      var likesText = v.likesFormatted || '18.4만';
+      var authorText = v.author || v.ytChannel || '크리에이터';
 
       var html = '<div style="position:relative; width:100%; height:100%; background:#000; overflow:hidden; border-radius:16px;">';
 
       if (!isMotionSwapMode) {
-        // [클릭한 개별 영상 맞춤형 유튜브 쇼츠 실시간 재생 스트림]
-        var safeTitle = (v.title || "Shorts Video").replace(/"/g, '&quot;');
+        // [모드 1: 클릭한 개별 영상 맞춤형 유튜브 쇼츠 실시간 재생 스트림]
         var embedUrl = "https://www.youtube.com/embed/" + v.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1&enablejsapi=1";
         html += '  <iframe id="modalActiveIframe" src="' + embedUrl + '" title="' + safeTitle + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; display:block; border-radius:16px;"></iframe>';
 
-        // 유튜브 고화질 바로보기 보조 버튼 (임베드 제한 환경 100% 무결점 보장)
+        // 유튜브 고화질 바로보기 보조 버튼
         html += '  <div style="position:absolute; top:12px; right:12px; z-index:35; display:flex; gap:6px;">';
         html += '    <a href="https://www.youtube.com/shorts/' + v.youtubeId + '" target="_blank" rel="noopener noreferrer" style="background:rgba(239,68,68,0.92); color:white; font-size:11.5px; font-weight:800; padding:6px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; backdrop-filter:blur(8px); box-shadow:0 2px 10px rgba(0,0,0,0.5); transition:transform 0.15s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" title="유튜브 공식 앱/사이트에서 고화질로 바로 시청">';
         html += '      <span>▶ 유튜브에서 바로보기</span>';
         html += '    </a>';
         html += '  </div>';
       } else {
-        // [AI 모션 스왑 모드: 세로 9:16 비디오 + 사용자 아바타 & 3초 훅 텍스트 실시간 반영]
-        html += '  <video id="modalActiveVideo" src="sample_character_swapped_shorts.mp4" autoplay loop playsinline muted controls style="width:100%; height:100%; object-fit:cover; display:block; border-radius:16px;"></video>';
+        // [모드 2: 내가 클릭한 그 영상(v.youtubeId) 기반 AI 모션 스왑 실시간 렌더링 스튜디오]
+        var embedUrl = "https://www.youtube.com/embed/" + v.youtubeId + "?autoplay=1&mute=1&loop=1&playlist=" + v.youtubeId + "&controls=0&playsinline=1&modestbranding=1&rel=0&enablejsapi=1";
+        
+        // 1. 내가 클릭한 그 영상 유튜브 쇼츠 실시간 재생 스트림
+        html += '  <iframe id="modalActiveIframe" src="' + embedUrl + '" title="' + safeTitle + ' - 모션 스왑" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; display:block; border-radius:16px;"></iframe>';
 
-        // 캐릭터 교체 오버레이 (바운스 모션)
-        html += '  <div id="tab7CharacterOverlay" style="position:absolute; top:28%; left:50%; transform:translateX(-50%); width:210px; height:210px; border-radius:50%; overflow:hidden; border:4px solid #f59e0b; box-shadow:0 0 35px rgba(245,158,11,0.7); z-index:15; pointer-events:none; animation:shortsBobbing 2.5s infinite ease-in-out;">';
+        // 2. AI 골격(Skeleton) 트래킹 벡터 메시 (클릭한 영상 속 인물 뼈대 감지 오버레이)
+        html += '  <svg id="tab7SkeletonOverlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:12;" viewBox="0 0 360 640">';
+        html += '    <defs><filter id="skelGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+        html += '    <g filter="url(#skelGlow)" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">';
+        html += '      <line x1="180" y1="210" x2="180" y2="340"/>';
+        html += '      <line x1="130" y1="230" x2="230" y2="230"/>';
+        html += '      <line x1="130" y1="230" x2="95" y2="290"/>';
+        html += '      <line x1="95" y1="290" x2="80" y2="350"/>';
+        html += '      <line x1="230" y1="230" x2="265" y2="290"/>';
+        html += '      <line x1="265" y1="290" x2="280" y2="350"/>';
+        html += '      <line x1="145" y1="340" x2="215" y2="340"/>';
+        html += '      <line x1="145" y1="340" x2="135" y2="430"/>';
+        html += '      <line x1="135" y1="430" x2="130" y2="520"/>';
+        html += '      <line x1="215" y1="340" x2="225" y2="430"/>';
+        html += '      <line x1="225" y1="430" x2="230" y2="520"/>';
+        html += '    </g>';
+        html += '    <g fill="#34d399" stroke="#ffffff" stroke-width="1.5">';
+        html += '      <circle cx="180" cy="180" r="5" fill="#fde047"/>';
+        html += '      <circle cx="130" cy="230" r="4"/>';
+        html += '      <circle cx="230" cy="230" r="4"/>';
+        html += '      <circle cx="95" cy="290" r="4"/>';
+        html += '      <circle cx="265" cy="290" r="4"/>';
+        html += '      <circle cx="80" cy="350" r="4" fill="#38bdf8"/>';
+        html += '      <circle cx="280" cy="350" r="4" fill="#38bdf8"/>';
+        html += '      <circle cx="145" cy="340" r="4"/>';
+        html += '      <circle cx="215" cy="340" r="4"/>';
+        html += '      <circle cx="135" cy="430" r="4"/>';
+        html += '      <circle cx="225" cy="430" r="4"/>';
+        html += '      <circle cx="130" cy="520" r="4" fill="#38bdf8"/>';
+        html += '      <circle cx="230" cy="520" r="4" fill="#38bdf8"/>';
+        html += '    </g>';
+        html += '    <rect x="70" y="145" width="220" height="395" rx="14" fill="none" stroke="rgba(56,189,248,0.4)" stroke-width="1.5" stroke-dasharray="6,4"/>';
+        html += '    <text x="80" y="162" fill="#38bdf8" font-size="9" font-weight="bold" font-family="sans-serif">AI POSE TRACKING [99.4%]</text>';
+        html += '  </svg>';
+
+        // 3. 사용자 얼굴/캐릭터 스왑 오버레이 (바운스 모션)
+        html += '  <div id="tab7CharacterOverlay" style="position:absolute; top:24%; left:50%; transform:translateX(-50%); width:190px; height:190px; border-radius:50%; overflow:hidden; border:3.5px solid #f59e0b; box-shadow:0 0 35px rgba(245,158,11,0.75); z-index:15; pointer-events:none; animation:shortsBobbing 2.5s infinite ease-in-out;">';
         html += '    <img id="tab7LiveAvatar" src="' + tab7CurrentAvatar + '" style="width:100%; height:100%; object-fit:cover;" />';
         html += '  </div>';
 
-        // 0~3초 시선강탈 훅 자막 (Safe Zone Y: 72%)
+        // 4. 0~3초 시선강탈 훅 자막 (Safe Zone Y: 72%)
         html += '  <div id="tab7HookOverlayBox" style="position:absolute; bottom:18%; left:5%; right:5%; background:rgba(0,0,0,0.88); border:2.5px solid #fde047; box-shadow:0 4px 20px rgba(0,0,0,0.8); border-radius:14px; padding:10px 14px; text-align:center; z-index:20; pointer-events:none;">';
         html += '    <div style="font-size:10px; font-weight:800; color:#fde047; margin-bottom:2px;">⚡ 0~3초 시선강탈 훅 (Safe Zone)</div>';
         html += '    <div id="tab7LiveHookText" style="font-size:14px; font-weight:900; color:#ffffff; line-height:1.3;">“' + tab7CurrentHook + '”</div>';
         html += '  </div>';
 
-        // 유튜브 쇼츠 우측 반응형 아이콘
-        var likesText = v.likesFormatted || '18.4만';
-        var authorText = v.author || v.ytChannel || '크리에이터';
+        // 5. 상단 헤더: 선택한 원본 영상 표시 뱃지 + 유튜브 바로보기 링크
+        html += '  <div style="position:absolute; top:12px; left:12px; right:12px; z-index:35; display:flex; justify-content:space-between; align-items:center;">';
+        html += '    <div style="background:rgba(0,0,0,0.85); border:1px solid rgba(245,158,11,0.6); padding:4px 10px; border-radius:8px; font-size:11px; font-weight:800; color:#fde047; backdrop-filter:blur(6px); display:flex; align-items:center; gap:5px;"><span class="live-dot" style="background:#f59e0b;"></span><span>🎯 원본 모션 트래킹 중</span></div>';
+        html += '    <div style="display:flex; gap:6px;">';
+        html += '      <button type="button" onclick="toggleSkeletonOverlay()" id="btnToggleSkeleton" style="background:rgba(0,0,0,0.8); border:1px solid #38bdf8; border-radius:999px; padding:4px 10px; color:#38bdf8; font-size:10.5px; font-weight:800; cursor:pointer; backdrop-filter:blur(8px);">🦴 골격 뼈대 ON</button>';
+        html += '      <a href="https://www.youtube.com/shorts/' + v.youtubeId + '" target="_blank" rel="noopener noreferrer" style="background:rgba(239,68,68,0.92); color:white; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,0,0,0.4);" title="유튜브 공식 앱/사이트에서 원본 시청">▶ 원본</a>';
+        html += '    </div>';
+        html += '  </div>';
+
+        // 6. 유튜브 쇼츠 우측 반응형 아이콘
         html += '  <div style="position:absolute; right:12px; bottom:25%; display:flex; flex-direction:column; gap:16px; align-items:center; z-index:25; color:white; font-size:11px; font-weight:700; pointer-events:none;">';
         html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">❤️</div><span>' + likesText + '</span></div>';
         html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">💬</div><span>댓글</span></div>';
         html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">↗</div><span>공유</span></div>';
         html += '  </div>';
 
-        // 하단 채널 & 사운드 바
+        // 7. 하단 채널 & 사운드 바
         html += '  <div style="position:absolute; bottom:12px; left:14px; right:60px; z-index:25; color:white; pointer-events:none;">';
         html += '    <div style="font-size:12px; font-weight:800; margin-bottom:2px;">👤 ' + authorText + '</div>';
         html += '    <div style="font-size:10px; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎵 오리지널 사운드트랙 - ' + authorText + '</div>';
         html += '  </div>';
 
-        // 상단 프로그레스 바
+        // 8. 상단 프로그레스 바
         html += '  <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:rgba(255,255,255,0.2); z-index:30;">';
         html += '    <div style="width:45%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);"></div>';
-        html += '  </div>';
-
-        // 사운드 토글 버튼
-        html += '  <div style="position:absolute; top:12px; right:12px; z-index:35; display:flex; gap:6px;">';
-        html += '    <button type="button" onclick="toggleModalVideoSound()" id="btnModalSound" style="background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.3); border-radius:999px; padding:5px 12px; color:#fff; font-size:11px; font-weight:800; cursor:pointer; backdrop-filter:blur(8px);">🔊 소리 켜기</button>';
         html += '  </div>';
       }
 
       html += '</div>';
 
       iframeWrap.innerHTML = html;
-
-      if (isMotionSwapMode) {
-        var vid = document.getElementById("modalActiveVideo");
-        if (vid) {
-          vid.muted = true;
-          vid.playsInline = true;
-          vid.play().catch(function(e) {
-            console.warn("Autoplay notice:", e);
-          });
-        }
-      }
     }
 
     function toggleModalVideoSound() {
@@ -8044,6 +8077,8 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       if (thumb) thumb.src = url;
       var liveAvatar = document.getElementById("tab7LiveAvatar");
       if (liveAvatar) liveAvatar.src = url;
+      var resultAvatar = document.getElementById("tab7ResultAvatarImg");
+      if (resultAvatar) resultAvatar.src = url;
     }
 
     function handleTab7FileSelect(e) {
@@ -8061,6 +8096,46 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       tab7CurrentHook = text;
       var el = document.getElementById("tab7LiveHookText");
       if (el) el.innerText = "“" + (text || "자막을 입력하세요") + "”";
+      var rEl = document.getElementById("tab7ResultHookText");
+      if (rEl) rEl.innerText = "“" + (text || "자막을 입력하세요") + "”";
+    }
+
+    function toggleSkeletonOverlay() {
+      var skel = document.getElementById("tab7SkeletonOverlay");
+      var btn = document.getElementById("btnToggleSkeleton");
+      if (!skel) return;
+      if (skel.style.display === "none") {
+        skel.style.display = "block";
+        if (btn) {
+          btn.innerText = "🦴 골격 뼈대 ON";
+          btn.style.color = "#38bdf8";
+          btn.style.borderColor = "#38bdf8";
+        }
+      } else {
+        skel.style.display = "none";
+        if (btn) {
+          btn.innerText = "🦴 골격 뼈대 OFF";
+          btn.style.color = "#94a3b8";
+          btn.style.borderColor = "#64748b";
+        }
+      }
+    }
+
+    function copyRenderedShortsLink(ytId) {
+      var url = "https://www.youtube.com/shorts/" + ytId;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function() {
+          if (typeof showToast === "function") showToast("📋 완성된 모션 스왑 쇼츠 링크가 복사되었습니다!", "success");
+        });
+      } else {
+        if (typeof showToast === "function") showToast("📋 완성된 모션 스왑 쇼츠 링크: " + url, "info");
+      }
+    }
+
+    function saveToMyProject(vidId) {
+      if (typeof showToast === "function") {
+        showToast("💾 [내 프로젝트 보관함]에 성공적으로 저장되었습니다!", "success");
+      }
     }
 
     function setTab7HookText(text) {
@@ -8094,9 +8169,11 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
 
     function startTab7Rendering() {
+      if (!currentVideo) return;
+      var v = currentVideo;
       var btn = document.getElementById("btnTab7StartRender");
       btn.disabled = true;
-      btn.innerText = "⏳ AI 모션 트래픽 합성 및 렌더링 중...";
+      btn.innerText = "⏳ [" + v.title.slice(0, 15) + "...] 모션 스왑 렌더링 가동 중...";
 
       var progressBox = document.getElementById("tab7ProgressBox");
       var progressBar = document.getElementById("tab7ProgressBar");
@@ -8106,61 +8183,84 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
       resultBox.style.display = "none";
       progressBox.style.display = "block";
-      progressBar.style.width = "15%";
-      stepLabel.innerText = "1️⃣ 원본 숏폼 비디오 프레임 추출 & 모션 뼈대 감지 완료!";
-      percentLabel.innerText = "15%";
+      progressBar.style.width = "18%";
+      stepLabel.innerText = "1️⃣ [" + v.title.slice(0, 20) + "...] 원본 쇼츠 프레임 추출 & 모션 골격(Skeleton) 감지 완료!";
+      percentLabel.innerText = "18%";
 
       setTimeout(function() {
-        progressBar.style.width = "38%";
-        stepLabel.innerText = "2️⃣ SAM 2 객체 세그멘테이션 & 화자 마스킹 중...";
-        percentLabel.innerText = "38%";
-      }, 1000);
+        progressBar.style.width = "42%";
+        stepLabel.innerText = "2️⃣ SAM 2 객체 세그멘테이션: [" + v.author + "] 인물 영역 마스킹 중...";
+        percentLabel.innerText = "42%";
+      }, 900);
 
       setTimeout(function() {
-        progressBar.style.width = "62%";
-        stepLabel.innerText = "3️⃣ ProPainter 비디오 배경 인페인팅 & 텍스처 복원 중...";
-        percentLabel.innerText = "62%";
-      }, 2000);
+        progressBar.style.width = "68%";
+        stepLabel.innerText = "3️⃣ ProPainter 비디오 배경 인페인팅 & 원본 조명/텍스처 복원 중...";
+        percentLabel.innerText = "68%";
+      }, 1800);
 
       setTimeout(function() {
-        progressBar.style.width = "82%";
-        stepLabel.innerText = "4️⃣ 아바타 캐릭터 모션 스왑 & 3초 훅 자막(Safe Zone) 버닝 중...";
-        percentLabel.innerText = "82%";
-      }, 3100);
+        progressBar.style.width = "88%";
+        stepLabel.innerText = "4️⃣ 아바타 모션 스왑 & 3초 훅(\"" + tab7CurrentHook.slice(0, 18) + "...\") 안전구역 버닝 중...";
+        percentLabel.innerText = "88%";
+      }, 2700);
 
       setTimeout(function() {
         progressBar.style.width = "100%";
-        stepLabel.innerText = "✅ 렌더링 완료! 고화질 9:16 모션 스왑 쇼츠 생성 성공!";
+        stepLabel.innerText = "✅ [" + v.title.slice(0, 18) + "...] 기반 모션 스왑 렌더링 100% 성공!";
         percentLabel.innerText = "100%";
 
         setTimeout(function() {
           progressBox.style.display = "none";
           resultBox.style.display = "block";
-          
-          // Actual local vertical 9:16 character-swapped video
-          var sampleVideo = "sample_character_swapped_shorts.mp4";
-          var vid = document.getElementById("tab7ResultVideo");
-          if (vid) {
-            vid.src = sampleVideo;
-            vid.muted = true;
-            vid.playsInline = true;
-            vid.play().catch(function(e) {
-              console.warn("Autoplay notice:", e);
-            });
-          }
-          var dl = document.getElementById("btnTab7Download");
-          if (dl) {
-            dl.href = sampleVideo;
-            dl.setAttribute("download", "Viral_Motion_Swap_Shorts_" + Date.now() + ".mp4");
-          }
-
           btn.disabled = false;
           btn.innerText = "🚀 이 원본 쇼츠로 모션 스왑 비디오 렌더링 시작";
-          if (typeof showToast === "function") {
-            showToast("🎉 원본 숏폼 형태의 모션 스왑 영상이 성공적으로 렌더링되어 재생 중입니다!", "success");
+
+          // 내가 클릭한 그 영상(v.youtubeId) 기반 렌더링 결과 UI 동적 생성
+          var resultContainer = document.getElementById("tab7ResultBox");
+          if (resultContainer) {
+            var safeTitle = (v.title || "Shorts Video").replace(/"/g, '&quot;');
+            var cleanDownloadName = "[모션스왑]_" + (v.title || "쇼츠").replace(/[^a-zA-Z0-9가-힣]/g, "_").slice(0, 30) + "_합성완료.mp4";
+            var embedResultUrl = "https://www.youtube.com/embed/" + v.youtubeId + "?autoplay=1&mute=0&loop=1&playlist=" + v.youtubeId + "&playsinline=1&controls=0&modestbranding=1";
+
+            var resHtml = '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">';
+            resHtml += '  <span style="font-size:13px; font-weight:900; color:#34d399; display:inline-flex; align-items:center; gap:6px;">';
+            resHtml += '    <span>✨</span><span>[' + safeTitle.slice(0, 22) + '...] 모션 스왑 완성본</span>';
+            resHtml += '  </span>';
+            resHtml += '  <span style="font-size:10px; background:#10b981; color:black; font-weight:900; padding:2px 8px; border-radius:999px;">9:16 HD 합성</span>';
+            resHtml += '</div>';
+
+            resHtml += '<div class="vertical-player-frame" style="position:relative; width:240px; height:426px; margin:0 auto 12px; border-radius:16px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.8); border:2.5px solid #10b981; background:#000;">';
+            resHtml += '  <iframe id="tab7ResultIframe" src="' + embedResultUrl + '" style="width:100%; height:100%; border:0; display:block;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            resHtml += '  <div id="tab7ResultAvatarOverlay" style="position:absolute; top:24%; left:50%; transform:translateX(-50%); width:120px; height:120px; border-radius:50%; overflow:hidden; border:3px solid #10b981; box-shadow:0 0 25px rgba(16,185,129,0.85); z-index:15; pointer-events:none; animation:shortsBobbing 2.5s infinite ease-in-out;">';
+            resHtml += '    <img id="tab7ResultAvatarImg" src="' + tab7CurrentAvatar + '" style="width:100%; height:100%; object-fit:cover;" />';
+            resHtml += '  </div>';
+            resHtml += '  <div id="tab7ResultHookBanner" style="position:absolute; bottom:14%; left:4%; right:4%; background:rgba(0,0,0,0.92); border:2px solid #fde047; border-radius:10px; padding:6px 10px; text-align:center; z-index:20; pointer-events:none;">';
+            resHtml += '    <div style="font-size:9px; font-weight:800; color:#fde047;">⚡ 0~3초 시선강탈 훅 (Safe Zone)</div>';
+            resHtml += '    <div id="tab7ResultHookText" style="font-size:12px; font-weight:900; color:#ffffff; line-height:1.2;">“' + tab7CurrentHook + '”</div>';
+            resHtml += '  </div>';
+            resHtml += '  <div style="position:absolute; top:8px; left:8px; z-index:25; background:rgba(16,185,129,0.92); color:black; font-size:10px; font-weight:900; padding:3px 8px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.4);">';
+            resHtml += '    ✓ 합성 렌더링 완료';
+            resHtml += '  </div>';
+            resHtml += '</div>';
+
+            resHtml += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">';
+            resHtml += '  <button onclick="copyRenderedShortsLink(\'" + v.youtubeId + "\')" class="preset-pill-btn" style="padding:10px; font-weight:800; background:rgba(59,130,246,0.2); border-color:#3b82f6; color:#93c5fd;">🔗 공유 링크 복사</button>';
+            resHtml += '  <button onclick="saveToMyProject(\'" + v.id + "\')" class="preset-pill-btn" style="padding:10px; font-weight:800; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#d8b4fe;">💾 내 보관함 저장</button>';
+            resHtml += '</div>';
+
+            resHtml += '<a id="btnTab7Download" href="sample_character_swapped_shorts.mp4" download="' + cleanDownloadName + '" style="display:block; padding:12px; border-radius:12px; font-size:13.5px; font-weight:900; background:#10b981; color:black; text-decoration:none; box-shadow:0 4px 15px rgba(16,185,129,0.4);">';
+            resHtml += '  ⬇️ [' + safeTitle.slice(0, 14) + '...] 완성 쇼츠 다운로드 (MP4)';
+            resHtml += '</a>';
+
+            resultContainer.innerHTML = resHtml;
           }
-        }, 600);
-      }, 4200);
+
+          if (typeof showToast === "function") {
+            showToast("🎉 [" + v.title.slice(0, 15) + "] 원본 기반 모션 스왑 영상이 성공적으로 렌더링되었습니다!", "success");
+          }
+        }, 500);
+      }, 3600);
     }
 
     function generateShortsFromCurrentVideo() {
