@@ -26,20 +26,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 def main():
     os.chdir(DIRECTORY)
     url = f"http://127.0.0.1:{PORT}/index.html"
-    print("=" * 65)
-    print("  [ViralScope AI] YouTube Shorts Real-Time Viral SaaS Dashboard")
-    print(f"  * URL: {url}")
-    print("  * YouTube Error 153 Prevented: HTTP Origin Active")
-    print("=" * 65)
+    print("=" * 70)
+    print("  🚀 [ViralScope AI] AI 숏폼 바이럴 분석 및 모션 스왑 렌더링 SaaS")
+    print(f"  * 접속 주소: {url}")
+    print("  * 유튜브 임베드 정책(Error 153 방지)을 위한 HTTP 로컬 서버 가동")
+    print("=" * 70)
     
-    # 포트 재사용 허용
     socketserver.TCPServer.allow_reuse_address = True
     try:
         with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
             httpd.serve_forever()
-    except OSError as e:
-        # Port already in use, which is fine (server already running)
-        print(f"Server already listening on port {PORT}.")
+    except OSError:
+        print(f"포트 {PORT}번이 이미 사용 중입니다. 브라우저에서 {url} 로 접속하세요.")
 
 if __name__ == "__main__":
     main()

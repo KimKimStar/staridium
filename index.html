@@ -2007,6 +2007,17 @@
         </div>
       </div>
 
+      <!-- 🎬 AI Motion Swap Studio Quick Launcher in Sidebar -->
+      <div style="padding:12px 14px 6px;">
+        <button onclick="openMotionSwapModal()" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-radius:14px; background:linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.3)); border:1.5px solid rgba(139, 92, 246, 0.65); color:white; font-size:13px; font-weight:800; cursor:pointer; transition:all 0.2s; text-align:left; box-shadow:0 4px 15px rgba(139,92,246,0.3);">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:16px;">🎬</span>
+            <span>AI 모션 스왑 스튜디오</span>
+          </div>
+          <span style="font-size:10px; background:#8b5cf6; color:white; padding:2px 7px; border-radius:6px; font-weight:900;">열기 ↗</span>
+        </button>
+      </div>
+
       <div class="sidebar-section-title">대한민국 숏폼 랭킹 (주제별 75개+)</div>
       <ul class="sidebar-nav" id="sidebarList"></ul>
     </aside>
@@ -2040,6 +2051,13 @@
 
         <div class="header-actions">
           <!-- YouTube API Key Modal Trigger -->
+          <!-- 🎬 AI Motion Swap Studio Quick Launcher in Header -->
+          <button class="btn-motion-swap-header" onclick="openMotionSwapModal()" title="AI 모션 스왑 & 3초 훅 렌더러 열기" style="display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:12px; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:white; font-size:12.5px; font-weight:800; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4); transition:all 0.2s;">
+            <span>🎬</span>
+            <span>AI 모션 스왑</span>
+            <span style="font-size:10px; background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:999px; color:#fef08a;">HOT</span>
+          </button>
+
           <button class="btn-api-key" onclick="openApiModal()">
             <span class="api-status-dot" id="apiStatusDot"></span>
             <span id="apiKeyBtnText">🔑 API 연동 설정</span>
@@ -7339,10 +7357,13 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
           html += '    </div>';
           html += '  </div>';
 
-          html += '  <div class="card-footer">';
-          html += '    <button class="btn-card-hook-primary" onclick="event.stopPropagation(); openAnatomyModal(\'' + v.id + '\')">';
-          html += '      <span>⚡ 3초 훅 & 분석 보기</span>';
+          html += '  <div class="card-footer" style="display:flex; gap:6px;">';
+          html += '    <button class="btn-card-hook-primary" style="flex:1;" onclick="event.stopPropagation(); openAnatomyModal(\'' + v.id + '\')">';
+          html += '      <span>⚡ 3초 훅 분석</span>';
           html += '      <span style="font-size:11px;">↗</span>';
+          html += '    </button>';
+          html += '    <button onclick="event.stopPropagation(); openMotionSwapForVideo(\'' + v.id + '\')" style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px; padding:8px 8px; border-radius:10px; font-size:12px; font-weight:800; background:linear-gradient(135deg, #8b5cf6, #ec4899); color:white; border:none; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 10px rgba(139,92,246,0.3);">';
+          html += '      <span>🎬 모션 스왑</span>';
           html += '    </button>';
           html += '  </div>';
           html += '</div>';
@@ -8412,7 +8433,7 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
   </script>
 
   <!-- 🎬 AI 모션 스왑 기반 숏폼 템플릿 렌더링 스튜디오 모달 -->
-  <div class="modal-overlay" id="motionSwapModal">
+  <div class="modal-overlay" id="motionSwapModal" onclick="if(event.target===this) closeMotionSwapModal()">
     <div class="modal-content motion-swap-modal-body">
       <div class="modal-header">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -8549,9 +8570,30 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
     var MOTION_CREDITS = 1; // 신규 유저 1회 무료 크레딧
     var IS_MOTION_PRO = false;
 
+    function openMotionSwapForVideo(videoId) {
+      var v = (window.currentDisplayedVideos || []).find(function(it) { return it.id === videoId; });
+      if (v) {
+        var shortUrl = "https://www.youtube.com/shorts/" + (v.youtubeId || "wsXipzlV6wc");
+        var hook = v.hookSummary || "";
+        window.location.href = "motionswap.html?url=" + encodeURIComponent(shortUrl) + "&hook=" + encodeURIComponent(hook);
+      } else {
+        window.location.href = "motionswap.html";
+      }
+    }
+
     function openMotionSwapModal() {
+      window.location.href = "motionswap.html";
+      return;
       document.getElementById("motionSwapModal").classList.add("active");
     }
+
+    
+    // Auto-open Motion Swap Modal if URL has #motionswap
+    window.addEventListener("DOMContentLoaded", function() {
+      if (window.location.hash === "#motionswap" || window.location.hash === "#motion" || window.location.search.indexOf("motion") !== -1) {
+        setTimeout(openMotionSwapModal, 300);
+      }
+    });
 
     function closeMotionSwapModal() {
       document.getElementById("motionSwapModal").classList.remove("active");
