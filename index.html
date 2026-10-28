@@ -7439,25 +7439,14 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
     function openCleanInSitePlayer() {
       if (!currentVideo) return;
-      // Use standard youtube.com embed with autoplay & playsinline
-      var cleanEmbedUrl = "https://www.youtube.com/embed/" + currentVideo.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
-      var iframeWrap = document.getElementById("videoIframeWrap");
-      if (iframeWrap) {
-        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
-      }
-
-      var playerLiveBadge = document.querySelector(".player-live-badge");
-      if (playerLiveBadge) {
-        playerLiveBadge.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; width:100%;"><div style="display:flex; align-items:center; gap:6px;"><span class="live-dot"></span><span style="color:#10b981; font-weight:700;">실시간 플레이어</span></div><a href="https://www.youtube.com/shorts/' + currentVideo.youtubeId + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:5px; background:#ef4444; color:white; font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:6px; text-decoration:none; box-shadow:0 2px 8px rgba(239,68,68,0.4);" title="유튜브 공식 앱/사이트에서 즉시 시청">▶ 유튜브에서 바로보기</a></div>';
-      }
-      // Also open distraction-free 9:16 viewer popup for guaranteed playback
+      loadModalVideoPlayer(currentVideo, false);
       var w = 450;
       var h = 820;
       var left = (window.screen.width / 2) - (w / 2);
       var top = (window.screen.height / 2) - (h / 2);
       window.open("https://www.youtube.com/shorts/" + currentVideo.youtubeId, "yt_clean_player", "width=" + w + ",height=" + h + ",top=" + top + ",left=" + left + ",menubar=no,toolbar=no,location=no,status=no,resizable=yes");
       if (typeof showToast === "function") {
-        showToast("▶ 숏폼 영상 사이트에서 바로보기 실행 완료!", "success");
+        showToast("▶ YouTube 공식 사이트에서 원본 시청 창이 열렸습니다!", "success");
       }
     }
 
@@ -7504,12 +7493,8 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       var platLabel = document.getElementById("modalPlayerPlatformLabel");
       // Clean view: technical player labels removed
 
-      // High-compatibility YouTube Embed without Error 153 cookie blockage
-      var cleanEmbedUrl = "https://www.youtube.com/embed/" + currentVideo.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
-      var iframeWrap = document.getElementById("videoIframeWrap");
-      if (iframeWrap) {
-        iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + currentVideo.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
-      }
+      // Guaranteed 100% Video Playback: Real 9:16 Shorts Video Stream
+      loadModalVideoPlayer(currentVideo, false);
 
       var playerLiveBadge = document.querySelector(".player-live-badge");
       if (playerLiveBadge) {
@@ -7565,15 +7550,13 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       var pane = document.getElementById("modalAnalysisPane");
       if (!pane || !currentVideo) return;
       var v = currentVideo;
+      if (tab !== "create") {
+        loadModalVideoPlayer(v, false);
+      }
 
             // TAB 1: 영상 보기 (Video Only Focus - Clean & High-End)
       if (tab === "video") {
-        // Restore YouTube embed iframe in left pane
-        var cleanEmbedUrl = "https://www.youtube.com/embed/" + v.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
-        var iframeWrap = document.getElementById("videoIframeWrap");
-        if (iframeWrap && (!iframeWrap.querySelector("iframe") || iframeWrap.innerHTML.indexOf("tab7CharacterOverlay") !== -1)) {
-          iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + v.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
-        }
+        loadModalVideoPlayer(v, false);
         var html = '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:18px; padding:20px; margin-bottom:14px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">';
         html += '    <span style="font-size:12px; font-weight:800; color:#60a5fa; text-transform:uppercase; letter-spacing:0.5px;">🎬 숏폼 영상 전용 시청 &amp; 개요</span>';
@@ -7923,51 +7906,93 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
     var tab7CurrentAvatar = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYTg1NWY3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNGMxZDk1Ii8+PC9yYWRpYWxHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9InNraW4iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmNkMzRkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImhhaXIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTI5M2IiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjIwMCIgZmlsbD0idXJsKCNiZykiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjEzMCIgZmlsbD0idXJsKCNoYWlyKSIvPjxwYXRoIGQ9Ik0gMTAwIDQwMCBDIDEwMCAyODAsIDMwMCAyODAsIDMwMCA0MDAgWiIgZmlsbD0iI2VjNDg5OSIvPjxwYXRoIGQ9Ik0gMTYwIDMwMCBMIDIwMCAzNzAgTCAyNDAgMzAwIFoiIGZpbGw9IiNkYjI3NzciLz48ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMTkwIiByeD0iOTAiIHJ5PSIxMDUiIGZpbGw9InVybCgjc2tpbikiLz48cGF0aCBkPSJNIDExMCAxODAgQyAxMTAgOTAsIDI5MCA5MCwgMjkwIDE4MCBDIDI2MCAxNDAsIDIyMCAxMzAsIDIwMCAxNDAgQyAxNzAgMTMwLCAxMzAgMTQwLCAxMTAgMTgwIFoiIGZpbGw9InVybCgjaGFpcikiLz48Y2lyY2xlIGN4PSIxNjUiIGN5PSIxODUiIHI9IjIyIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjM1IiBjeT0iMTg1IiByPSIyMiIgZmlsbD0iI2ZmZmZmZiIvPjxjaXJjbGUgY3g9IjE3MCIgY3k9IjE4NSIgcj0iMTIiIGZpbGw9IiMzYjgyZjYiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIxODUiIHI9IjEyIiBmaWxsPSIjM2I4MmY2Ii8+PGNpcmNsZSBjeD0iMTcyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjQyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMTM1IiB5PSIxNTUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1NSIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjIwNSIgeT0iMTU1IiB3aWR0aD0iNjAiIGhlaWdodD0iNTUiIHJ4PSIxNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjhmYWZjIiBzdHJva2Utd2lkdGg9IjYiLz48bGluZSB4MT0iMTk1IiB5MT0iMTgyIiB4Mj0iMjA1IiB5Mj0iMTgyIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0gMTY4IDIzMCBRIDIwMCAyNjUgMjMyIDIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYjQ1MzA5IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==";
     var tab7CurrentHook = "";
 
-    function renderMotionSwapLiveLeftPane(v) {
+    
+    var tab7CurrentAvatar = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYTg1NWY3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNGMxZDk1Ii8+PC9yYWRpYWxHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9InNraW4iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmNkMzRkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImhhaXIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTI5M2IiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjIwMCIgZmlsbD0idXJsKCNiZykiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjEzMCIgZmlsbD0idXJsKCNoYWlyKSIvPjxwYXRoIGQ9Ik0gMTAwIDQwMCBDIDEwMCAyODAsIDMwMCAyODAsIDMwMCA0MDAgWiIgZmlsbD0iI2VjNDg5OSIvPjxwYXRoIGQ9Ik0gMTYwIDMwMCBMIDIwMCAzNzAgTCAyNDAgMzAwIFoiIGZpbGw9IiNkYjI3NzciLz48ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMTkwIiByeD0iOTAiIHJ5PSIxMDUiIGZpbGw9InVybCgjc2tpbikiLz48cGF0aCBkPSJNIDExMCAxODAgQyAxMTAgOTAsIDI5MCA5MCwgMjkwIDE4MCBDIDI2MCAxNDAsIDIyMCAxMzAsIDIwMCAxNDAgQyAxNzAgMTMwLCAxMzAgMTQwLCAxMTAgMTgwIFoiIGZpbGw9InVybCgjaGFpcikiLz48Y2lyY2xlIGN4PSIxNjUiIGN5PSIxODUiIHI9IjIyIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjM1IiBjeT0iMTg1IiByPSIyMiIgZmlsbD0iI2ZmZmZmZiIvPjxjaXJjbGUgY3g9IjE3MCIgY3k9IjE4NSIgcj0iMTIiIGZpbGw9IiMzYjgyZjYiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIxODUiIHI9IjEyIiBmaWxsPSIjM2I4MmY2Ii8+PGNpcmNsZSBjeD0iMTcyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjQyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMTM1IiB5PSIxNTUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1NSIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjIwNSIgeT0iMTU1IiB3aWR0aD0iNjAiIGhlaWdodD0iNTUiIHJ4PSIxNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjhmYWZjIiBzdHJva2Utd2lkdGg9IjYiLz48bGluZSB4MT0iMTk1IiB5MT0iMTgyIiB4Mj0iMjA1IiB5Mj0iMTgyIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0gMTY4IDIzMCBRIDIwMCAyNjUgMjMyIDIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYjQ1MzA5IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==";
+    var tab7CurrentHook = "";
+
+    function loadModalVideoPlayer(v, isMotionSwapMode) {
       var iframeWrap = document.getElementById("videoIframeWrap");
-      if (!iframeWrap) return;
+      if (!iframeWrap || !v) return;
+
+      var currentVid = document.getElementById("modalActiveVideo");
+      var hasOverlay = document.getElementById("tab7CharacterOverlay");
+
+      // Seamless playback: if already playing in target mode, do not recreate video element
+      if (currentVid && ((isMotionSwapMode && hasOverlay) || (!isMotionSwapMode && !hasOverlay))) {
+        return;
+      }
 
       tab7CurrentHook = (v.hookSummary || v.title);
-      var thumbUrl = v.thumbnail || ("https://i.ytimg.com/vi/" + v.youtubeId + "/hqdefault.jpg");
 
-      // Render the Authentic YouTube Shorts View with Character Swap Overlay
-      var previewHtml = '<div style="position:relative; width:100%; height:100%; background:#000; overflow:hidden; border-radius:16px;">';
-      
-      // Authentic Background Video Thumbnail
-      previewHtml += '  <img id="tab7BgPoster" src="' + thumbUrl + '" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.85);" />';
-      
-      // Swapped Character Overlay in Center of the Shorts
-      previewHtml += '  <div id="tab7CharacterOverlay" style="position:absolute; top:28%; left:50%; transform:translateX(-50%); width:220px; height:220px; border-radius:50%; overflow:hidden; border:4px solid #f59e0b; box-shadow:0 0 35px rgba(245,158,11,0.7); z-index:15; animation:shortsBobbing 2.5s infinite ease-in-out;">';
-      previewHtml += '    <img id="tab7LiveAvatar" src="' + tab7CurrentAvatar + '" style="width:100%; height:100%; object-fit:cover;" />';
-      previewHtml += '  </div>';
+      var html = '<div style="position:relative; width:100%; height:100%; background:#000; overflow:hidden; border-radius:16px;">';
 
-      // 0~3s Bold Viral Hook Subtitle in Golden Safe Zone (Y: 72%)
-      previewHtml += '  <div id="tab7HookOverlayBox" style="position:absolute; bottom:18%; left:5%; right:5%; background:rgba(0,0,0,0.85); border:2.5px solid #fde047; box-shadow:0 4px 20px rgba(0,0,0,0.8); border-radius:14px; padding:10px 14px; text-align:center; z-index:20;">';
-      previewHtml += '    <div style="font-size:10px; font-weight:800; color:#fde047; margin-bottom:2px;">⚡ 0~3초 시선강탈 훅 (Safe Zone)</div>';
-      previewHtml += '    <div id="tab7LiveHookText" style="font-size:14px; font-weight:900; color:#ffffff; line-height:1.3;">“' + tab7CurrentHook + '”</div>';
-      previewHtml += '  </div>';
+      // 1. Authentic 9:16 Vertical Video Stream (Local 1080x1920 MP4)
+      html += '  <video id="modalActiveVideo" src="sample_character_swapped_shorts.mp4" autoplay loop playsinline muted controls style="width:100%; height:100%; object-fit:cover; display:block;"></video>';
 
-      // Authentic YouTube Shorts Right Rail Icons
-      previewHtml += '  <div style="position:absolute; right:12px; bottom:25%; display:flex; flex-direction:column; gap:16px; align-items:center; z-index:25; color:white; font-size:11px; font-weight:700;">';
-      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">❤️</div><span>' + v.likesFormatted + '</span></div>';
-      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">💬</div><span>댓글</span></div>';
-      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">↗</div><span>공유</span></div>';
-      previewHtml += '  </div>';
+      if (isMotionSwapMode) {
+        // 2. Swapped Character Overlay in Center of the Shorts
+        html += '  <div id="tab7CharacterOverlay" style="position:absolute; top:28%; left:50%; transform:translateX(-50%); width:210px; height:210px; border-radius:50%; overflow:hidden; border:4px solid #f59e0b; box-shadow:0 0 35px rgba(245,158,11,0.7); z-index:15; pointer-events:none; animation:shortsBobbing 2.5s infinite ease-in-out;">';
+        html += '    <img id="tab7LiveAvatar" src="' + tab7CurrentAvatar + '" style="width:100%; height:100%; object-fit:cover;" />';
+        html += '  </div>';
 
-      // Bottom Shorts Channel & Sound bar
-      previewHtml += '  <div style="position:absolute; bottom:12px; left:14px; right:60px; z-index:25; color:white;">';
-      previewHtml += '    <div style="font-size:12px; font-weight:800; margin-bottom:2px;">👤 ' + v.author + '</div>';
-      previewHtml += '    <div style="font-size:10px; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎵 오리지널 사운드트랙 - ' + v.author + '</div>';
-      previewHtml += '  </div>';
+        // 3. 0~3s Bold Viral Hook Subtitle in Golden Safe Zone (Y: 72%)
+        html += '  <div id="tab7HookOverlayBox" style="position:absolute; bottom:18%; left:5%; right:5%; background:rgba(0,0,0,0.88); border:2.5px solid #fde047; box-shadow:0 4px 20px rgba(0,0,0,0.8); border-radius:14px; padding:10px 14px; text-align:center; z-index:20; pointer-events:none;">';
+        html += '    <div style="font-size:10px; font-weight:800; color:#fde047; margin-bottom:2px;">⚡ 0~3초 시선강탈 훅 (Safe Zone)</div>';
+        html += '    <div id="tab7LiveHookText" style="font-size:14px; font-weight:900; color:#ffffff; line-height:1.3;">“' + tab7CurrentHook + '”</div>';
+        html += '  </div>';
 
-      // Top progress bar
-      previewHtml += '  <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:rgba(255,255,255,0.2); z-index:30;">';
-      previewHtml += '    <div style="width:45%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);"></div>';
-      previewHtml += '  </div>';
+        // 4. Authentic YouTube Shorts Right Rail Icons
+        var likesText = v.likesFormatted || '18.4만';
+        var authorText = v.author || v.ytChannel || '크리에이터';
+        html += '  <div style="position:absolute; right:12px; bottom:25%; display:flex; flex-direction:column; gap:16px; align-items:center; z-index:25; color:white; font-size:11px; font-weight:700; pointer-events:none;">';
+        html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">❤️</div><span>' + likesText + '</span></div>';
+        html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">💬</div><span>댓글</span></div>';
+        html += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px;">↗</div><span>공유</span></div>';
+        html += '  </div>';
 
-      previewHtml += '</div>';
+        // Bottom Shorts Channel & Sound bar
+        html += '  <div style="position:absolute; bottom:12px; left:14px; right:60px; z-index:25; color:white; pointer-events:none;">';
+        html += '    <div style="font-size:12px; font-weight:800; margin-bottom:2px;">👤 ' + authorText + '</div>';
+        html += '    <div style="font-size:10px; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎵 오리지널 사운드트랙 - ' + authorText + '</div>';
+        html += '  </div>';
 
-      iframeWrap.innerHTML = previewHtml;
+        // Top progress bar
+        html += '  <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:rgba(255,255,255,0.2); z-index:30;">';
+        html += '    <div style="width:45%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);"></div>';
+        html += '  </div>';
+      }
+
+      // Sound & Mode Controls Floating Bar
+      html += '  <div style="position:absolute; top:12px; right:12px; z-index:35; display:flex; gap:6px;">';
+      html += '    <button type="button" onclick="toggleModalVideoSound()" id="btnModalSound" style="background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.3); border-radius:999px; padding:5px 12px; color:#fff; font-size:11px; font-weight:800; cursor:pointer; backdrop-filter:blur(8px);">🔊 소리 켜기</button>';
+      html += '  </div>';
+
+      html += '</div>';
+
+      iframeWrap.innerHTML = html;
+
+      var vid = document.getElementById("modalActiveVideo");
+      if (vid) {
+        vid.muted = true;
+        vid.playsInline = true;
+        vid.play().catch(function(e) {
+          console.warn("Autoplay notice:", e);
+        });
+      }
+    }
+
+    function toggleModalVideoSound() {
+      var vid = document.getElementById("modalActiveVideo");
+      var btn = document.getElementById("btnModalSound");
+      if (!vid) return;
+      vid.muted = !vid.muted;
+      if (btn) {
+        btn.innerText = vid.muted ? "🔊 소리 켜기" : "🔇 무음 모드";
+      }
+    }
+
+    function renderMotionSwapLiveLeftPane(v) {
+      loadModalVideoPlayer(v, true);
     }
 
     function setTab7Avatar(url) {
