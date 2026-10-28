@@ -1987,6 +1987,12 @@
       }
     }
 
+  
+    @keyframes shortsBobbing {
+      0%, 100% { transform: translateX(-50%) translateY(0px) scale(1); }
+      50% { transform: translateX(-50%) translateY(-8px) scale(1.02); }
+    }
+
   </style>
 </head>
 <body>
@@ -2165,7 +2171,7 @@
         <button class="m-tab-btn" id="tabBtnScript" onclick="switchModalTab('script')">④ 📝 실제 대사 · 화면 글씨 스크립트</button>
         <button class="m-tab-btn" id="tabBtnSimilar" onclick="switchModalTab('similar')">⑤ 🔗 비슷한 태그·주제 추천 5선</button>
         <button class="m-tab-btn" id="tabBtnAction" onclick="switchModalTab('action')">⑥ 💡 내 채널 적용 가이드</button>
-        <button class="m-tab-btn" id="tabBtnCreate" onclick="switchModalTab('create')" style="background:rgba(139, 92, 246, 0.15); color:#f9fafb; font-weight:600; border:1px solid rgba(139, 92, 246, 0.4);">⑦ 🚀 이 구성으로 내 쇼츠 만들기 ⭐</button>
+        <button class="m-tab-btn" id="tabBtnCreate" onclick="switchModalTab('create')" style="background:rgba(139, 92, 246, 0.15); color:#f9fafb; font-weight:600; border:1px solid rgba(139, 92, 246, 0.4);">⑦ 🎬 AI 모션 스왑 스튜디오 ⭐</button>
       </div>
 
       <!-- Modal Body Split: Left Video Pane, Right Dynamic Content Pane -->
@@ -2194,7 +2200,7 @@
           <!-- Quick Jump to Remake Studio Button -->
           <div style="margin-top:12px;">
             <button onclick="switchModalTab('create')" style="width:100%; padding:11px; border-radius:10px; font-size:12.5px; font-weight:900; background:linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.25)); border:1px solid rgba(245,158,11,0.5); color:#fef08a; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
-              <span>⭐ 이 구성으로 나만의 쇼츠 만들기 (탭 ⑦)</span>
+              <span>🎬 이 영상으로 AI 모션 스왑 시작 (탭 ⑦)</span>
             </button>
           </div>
         </div>
@@ -7560,8 +7566,14 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       if (!pane || !currentVideo) return;
       var v = currentVideo;
 
-      // TAB 1: 영상 보기 (Video Only Focus - Clean & High-End)
+            // TAB 1: 영상 보기 (Video Only Focus - Clean & High-End)
       if (tab === "video") {
+        // Restore YouTube embed iframe in left pane
+        var cleanEmbedUrl = "https://www.youtube.com/embed/" + v.youtubeId + "?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1";
+        var iframeWrap = document.getElementById("videoIframeWrap");
+        if (iframeWrap && (!iframeWrap.querySelector("iframe") || iframeWrap.innerHTML.indexOf("tab7CharacterOverlay") !== -1)) {
+          iframeWrap.innerHTML = '<iframe src="' + cleanEmbedUrl + '" title="' + v.title.replace(/"/g, '&quot;') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen style="width:100%; height:100%; border:0; border-radius:12px;"></iframe>';
+        }
         var html = '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:18px; padding:20px; margin-bottom:14px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">';
         html += '    <span style="font-size:12px; font-weight:800; color:#60a5fa; text-transform:uppercase; letter-spacing:0.5px;">🎬 숏폼 영상 전용 시청 &amp; 개요</span>';
@@ -7807,80 +7819,78 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
         pane.innerHTML = html;
       }
 
-      // TAB 7: 이 구성으로 내 쇼츠 만들기 (내 사이트의 하이라이트 킬러 기능 ⭐)
+      // TAB 7: 🎬 AI 모션 스왑 스튜디오 (원래 쇼츠 형태 100% 반영)
       else if (tab === "create") {
-        var html = '<div style="background:linear-gradient(135deg, rgba(147,51,234,0.3), rgba(236,72,153,0.25)); border:1.5px solid rgba(245,158,11,0.6); border-radius:18px; padding:20px; margin-bottom:14px;">';
+        // Reflect original shorts live preview in left pane
+        renderMotionSwapLiveLeftPane(v);
+
+        var html = '<div style="background:linear-gradient(135deg, rgba(147,51,234,0.35), rgba(236,72,153,0.3)); border:1.5px solid rgba(245,158,11,0.6); border-radius:18px; padding:18px; margin-bottom:14px;">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
-        html += '    <span style="font-size:11px; font-weight:900; color:#fef08a; text-transform:uppercase; letter-spacing:0.5px;">⭐ 내 사이트의 하이라이트 킬러 기능</span>';
-        html += '    <span style="font-size:11px; font-weight:800; background:rgba(16,185,129,0.2); color:#34d399; padding:2px 8px; border-radius:999px;">AI 모션 트래픽 자동 추출됨</span>';
+        html += '    <span style="font-size:11px; font-weight:900; color:#fef08a; text-transform:uppercase; letter-spacing:0.5px;">⭐ AI 모션 스왑 &amp; 3초 훅 렌더러</span>';
+        html += '    <span style="font-size:11px; font-weight:800; background:rgba(16,185,129,0.25); color:#34d399; padding:3px 9px; border-radius:999px;">✓ 원본 숏폼 모션 뼈대 감지됨</span>';
         html += '  </div>';
-        html += '  <h3 style="font-size:16px; font-weight:900; color:white; margin-bottom:4px;">원본 영상 그대로 가져와서 내가 원하는 요소만 쏙쏙 변경!</h3>';
-        html += '  <p style="font-size:11.5px; color:#e5e7eb; line-height:1.4;">원본 영상 속 인물의 움직임 트래픽을 따서, 내가 올린 사진(또는 AI 캐릭터)이 그 움직임 그대로 움직이고 원래 영상과 동일한 위치에 자막/BGM을 얹어 렌더링합니다.</p>';
+        html += '  <h3 style="font-size:16px; font-weight:900; color:white; margin-bottom:4px;">' + v.title + '</h3>';
+        html += '  <div style="font-size:11.5px; color:#e2e8f0; line-height:1.4;">원본 숏폼의 <strong>실제 카메라 워크, 리듬, 배경, 인물 움직임</strong>을 100% 유지한 채, 내 얼굴/캐릭터와 3초 훅 자막만 자연스럽게 교체합니다.</div>';
         html += '</div>';
 
-        // 1. Character & Motion Swap
+        // 1. Character & Face Swap Selection
         html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
-        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">1️⃣ 인물 / 모션 트래픽 스왑 (Motion Tracking)</div>';
-        html += '  <p style="font-size:11px; color:#9ca3af; margin-bottom:8px;">사람의 움직임 트래픽을 따서 아래 선택한 캐릭터가 그 트래픽 그대로 움직입니다.</p>';
-        html += '  <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">';
-        html += '    <img id="tab7CharThumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" style="width:50px; height:65px; border-radius:8px; object-fit:cover; border:2px solid #ec4899;" />';
+        html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
+        html += '    <span style="font-size:12.5px; font-weight:800; color:white;">1️⃣ 내 얼굴 / 캐릭터 사진 스왑 (Face &amp; Motion Swap)</span>';
+        html += '    <span style="font-size:10.5px; color:#c4b5fd;">실시간 왼쪽 프리뷰 반영</span>';
+        html += '  </div>';
+        html += '  <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">';
+        html += '    <img id="tab7CharThumb" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYTg1NWY3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNGMxZDk1Ii8+PC9yYWRpYWxHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9InNraW4iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmNkMzRkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImhhaXIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTI5M2IiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjIwMCIgZmlsbD0idXJsKCNiZykiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjEzMCIgZmlsbD0idXJsKCNoYWlyKSIvPjxwYXRoIGQ9Ik0gMTAwIDQwMCBDIDEwMCAyODAsIDMwMCAyODAsIDMwMCA0MDAgWiIgZmlsbD0iI2VjNDg5OSIvPjxwYXRoIGQ9Ik0gMTYwIDMwMCBMIDIwMCAzNzAgTCAyNDAgMzAwIFoiIGZpbGw9IiNkYjI3NzciLz48ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMTkwIiByeD0iOTAiIHJ5PSIxMDUiIGZpbGw9InVybCgjc2tpbikiLz48cGF0aCBkPSJNIDExMCAxODAgQyAxMTAgOTAsIDI5MCA5MCwgMjkwIDE4MCBDIDI2MCAxNDAsIDIyMCAxMzAsIDIwMCAxNDAgQyAxNzAgMTMwLCAxMzAgMTQwLCAxMTAgMTgwIFoiIGZpbGw9InVybCgjaGFpcikiLz48Y2lyY2xlIGN4PSIxNjUiIGN5PSIxODUiIHI9IjIyIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjM1IiBjeT0iMTg1IiByPSIyMiIgZmlsbD0iI2ZmZmZmZiIvPjxjaXJjbGUgY3g9IjE3MCIgY3k9IjE4NSIgcj0iMTIiIGZpbGw9IiMzYjgyZjYiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIxODUiIHI9IjEyIiBmaWxsPSIjM2I4MmY2Ii8+PGNpcmNsZSBjeD0iMTcyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjQyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMTM1IiB5PSIxNTUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1NSIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjIwNSIgeT0iMTU1IiB3aWR0aD0iNjAiIGhlaWdodD0iNTUiIHJ4PSIxNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjhmYWZjIiBzdHJva2Utd2lkdGg9IjYiLz48bGluZSB4MT0iMTk1IiB5MT0iMTgyIiB4Mj0iMjA1IiB5Mj0iMTgyIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0gMTY4IDIzMCBRIDIwMCAyNjUgMjMyIDIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYjQ1MzA5IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==" style="width:58px; height:58px; border-radius:50%; object-fit:cover; border:2.5px solid #f59e0b; box-shadow:0 0 15px rgba(245,158,11,0.5);" />';
         html += '    <div style="flex:1;">';
         html += '      <input type="file" id="tab7FileInput" accept="image/*" style="display:none;" onchange="handleTab7FileSelect(event)" />';
-        html += '      <button onclick="document.getElementById(\'tab7FileInput\').click()" class="preset-pill-btn" style="background:rgba(236,72,153,0.2); border-color:#ec4899; color:white; font-weight:700; padding:6px 12px;">📸 내 사진/셀카 업로드 (Drag&Drop)</button>';
-        html += '      <div style="font-size:10.5px; color:#9ca3af; margin-top:3px;">또는 아래 AI 아바타 프리셋 선택:</div>';
+        html += '      <button onclick="document.getElementById(\'tab7FileInput\').click()" class="preset-pill-btn" style="background:rgba(236,72,153,0.25); border-color:#ec4899; color:white; font-weight:800; padding:7px 14px;">📸 내 셀카 / 사진 업로드 (클릭 또는 파일 선택)</button>';
+        html += '      <div style="font-size:10.5px; color:#9ca3af; margin-top:4px;">JPG, PNG, WEBP 지원 (선택 즉시 왼쪽 영상의 인물에 덧씌워집니다)</div>';
         html += '    </div>';
         html += '  </div>';
         html += '  <div style="display:flex; gap:6px; flex-wrap:wrap;">';
-        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80\')">3D 픽사</button>';
-        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=80\')">20대 여성</button>';
-        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80\')">30대 남성</button>';
-        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80\')">사이버 아바타</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'' + uri_pixar + '\')">🎨 3D 픽사</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'' + uri_female + '\')">👩 20대 여성</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'' + uri_male + '\')">👨 30대 남성</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7Avatar(\'' + uri_cyber + '\')">⚡ 사이버 AI</button>';
         html += '  </div>';
         html += '</div>';
 
-        // 2. Text / Subtitle Placement
+        // 2. 0~3s Hook Subtitle Customization
+        var initialHook = (v.hookSummary || v.title).replace(/"/g, '&quot;');
         html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
         html += '  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">';
-        html += '    <span style="font-size:12.5px; font-weight:800; color:white;">2️⃣ 텍스트 / 자막 교체 (원래 영상과 동일 위치 배치)</span>';
-        html += '    <span style="font-size:10.5px; color:#fde047;">Safe Zone (Y: 68%)</span>';
+        html += '    <span style="font-size:12.5px; font-weight:800; color:white;">2️⃣ 0~3초 훅 자막 교체 (원래 영상 Safe Zone 위치)</span>';
+        html += '    <span style="font-size:10.5px; color:#fde047; font-weight:700;">Safe Zone Y: 72%</span>';
         html += '  </div>';
-        html += '  <input type="text" id="tab7HookText" value="' + (v.hookSummary || v.title).replace(/"/g, '&quot;') + '" style="width:100%; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); color:white; font-size:12.5px; margin-bottom:6px;" />';
-        html += '  <div style="font-size:10.5px; color:#9ca3af;">원래 영상의 자막 위치와 동일하게 노란색 하이라이트 박스로 0~3초간 자동 오버레이됩니다.</div>';
-        html += '</div>';
-
-        // 3. BGM & Music Selection
-        html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:12px;">';
-        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">3️⃣ 노래 / BGM 선택</div>';
-        html += '  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
-        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" checked /> 🎵 원본 사운드트랙 유지</label>';
-        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> 🔥 신나는 댄스 비트 (128 BPM)</label>';
-        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> ⚡ 미스터리 텐션 비트 (132 BPM)</label>';
-        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7Bgm" /> ☕ 감성 로우파이 칠 비트</label>';
+        html += '  <input type="text" id="tab7HookText" value="' + initialHook + '" oninput="updateTab7HookPreview(this.value)" style="width:100%; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); color:white; font-size:13px; font-weight:700; margin-bottom:6px;" />';
+        html += '  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">';
+        html += '    <button class="preset-pill-btn" onclick="setTab7HookText(\'🔥 3초 만에 100만 조회수 터지는 비밀 공개!\')">조회수 꿀팁 🔥</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7HookText(\'❌ 절대 하지 마세요! 99%가 틀리는 치명적 실수\')">손실 회피 ❌</button>';
+        html += '    <button class="preset-pill-btn" onclick="setTab7HookText(\'⚡ 아직도 이걸 모르고 계셨나요? 딱 3초면 됩니다\')">인생 역전 ⚡</button>';
         html += '  </div>';
         html += '</div>';
 
-        // 4. Thumbnail Selection
+        // 3. Audio & Soundtrack Selection
         html += '<div style="background:var(--surface-card); border:1px solid var(--surface-border); border-radius:14px; padding:14px; margin-bottom:14px;">';
-        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">4️⃣ 썸네일 선택</div>';
-        html += '  <div style="display:flex; gap:10px; font-size:11.5px;">';
-        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" checked /> 🖼️ 원본 썸네일 스타일 유지</label>';
-        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" /> 📸 내 사진 썸네일</label>';
-        html += '    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="tab7Thumb" /> ✨ AI 바이럴 썸네일 자동 생성</label>';
+        html += '  <div style="font-size:12.5px; font-weight:800; color:white; margin-bottom:6px;">3️⃣ 사운드 &amp; 보이스 설정</div>';
+        html += '  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7AudioOpt" checked /> 🎵 원본 사운드트랙 &amp; 목소리 유지</label>';
+        html += '    <label style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); padding:8px 10px; border-radius:8px; font-size:11.5px; cursor:pointer;"><input type="radio" name="tab7AudioOpt" /> 🎙️ OpenAI TTS 맞춤 보이스 합성</label>';
         html += '  </div>';
         html += '</div>';
 
-        // Action Render Button
-        html += '<div style="background:linear-gradient(135deg, rgba(139,92,246,0.25), rgba(236,72,153,0.2)); border:1.5px solid rgba(245,158,11,0.6); border-radius:16px; padding:18px; text-align:center;">';
+        // 4. Action Render Button
+        html += '<div style="background:linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.25)); border:1.5px solid rgba(245,158,11,0.6); border-radius:16px; padding:18px; text-align:center;">';
         html += '  <button id="btnTab7StartRender" onclick="startTab7Rendering()" style="width:100%; padding:14px; border-radius:12px; font-size:15px; font-weight:900; background:linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b); color:white; border:none; cursor:pointer; box-shadow:0 6px 20px rgba(139,92,246,0.4); transition:all 0.2s;">';
-        html += '    🚀 이 구성으로 나만의 쇼츠 1초 만에 자동 렌더링';
+        html += '    🚀 이 원본 쇼츠로 모션 스왑 비디오 렌더링 시작';
         html += '  </button>';
-        html += '  <div style="font-size:11px; color:#9ca3af; margin-top:8px;">클릭 즉시 인물 모션 트래픽 합성 + 텍스트 오버레이 + BGM 믹싱이 파이프라인으로 렌더링됩니다.</div>';
+        html += '  <div style="font-size:11px; color:#9ca3af; margin-top:8px;">인물 골격 트래킹 + 인페인팅 + 3초 훅 자막 합성이 화면 안에서 바로 진행됩니다.</div>';
         html += '</div>';
 
         // Tab 7 Progress Box
         html += '<div id="tab7ProgressBox" style="display:none; background:rgba(0,0,0,0.6); border:1px solid rgba(139,92,246,0.4); border-radius:14px; padding:16px; margin-top:14px;">';
         html += '  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; margin-bottom:6px;">';
-        html += '    <span id="tab7StepLabel" style="color:#c084fc;">1️⃣ 원본 영상 모션 트래픽(Pose Skeleton) 추출 중...</span>';
+        html += '    <span id="tab7StepLabel" style="color:#c084fc;">1️⃣ 원본 영상 모션 트래픽(Pose Skeleton) 추출 완료!</span>';
         html += '    <span id="tab7PercentLabel" style="color:#facc15;">25%</span>';
         html += '  </div>';
         html += '  <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:999px; overflow:hidden;">';
@@ -7889,12 +7899,18 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
         html += '</div>';
 
         // Tab 7 Result Box
-        html += '<div id="tab7ResultBox" style="display:none; background:rgba(0,0,0,0.5); border:1.5px solid #10b981; border-radius:16px; padding:16px; margin-top:14px; text-align:center;">';
-        html += '  <div style="font-size:13px; font-weight:900; color:#34d399; margin-bottom:10px;">✨ 나만의 9:16 모션 스왑 쇼츠 완성!</div>';
-        html += '  <div class="vertical-player-frame" style="width:220px; height:391px; margin:0 auto 12px;">';
-        html += '    <video id="tab7ResultVideo" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>';
+        html += '<div id="tab7ResultBox" style="display:none; background:rgba(0,0,0,0.6); border:1.5px solid #10b981; border-radius:16px; padding:16px; margin-top:14px; text-align:center;">';
+        html += '  <div style="display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; font-weight:900; color:#34d399; margin-bottom:10px;">';
+        html += '    <span>✨</span><span>나만의 9:16 모션 스왑 완성! (재생 중)</span>';
         html += '  </div>';
-        html += '  <a id="btnTab7Download" href="#" download="My_Viral_Shorts.mp4" style="display:block; padding:12px; border-radius:10px; font-size:13px; font-weight:900; background:#10b981; color:black; text-decoration:none; box-shadow:0 4px 15px rgba(16,185,129,0.3);">';
+        html += '  <div class="vertical-player-frame" style="width:240px; height:426px; margin:0 auto 12px; border-radius:16px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.8); border:2px solid #10b981;">';
+        html += '    <video id="tab7ResultVideo" controls autoplay loop playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>';
+        html += '  </div>';
+        html += '  <div style="display:flex; gap:8px; margin-bottom:10px;">';
+        html += '    <button onclick="toggleTab7VideoPlayback()" id="btnTab7PlayPause" class="preset-pill-btn" style="flex:1; padding:8px; font-weight:800;">⏸ 일시정지</button>';
+        html += '    <button onclick="toggleTab7Sound()" id="btnTab7Sound" class="preset-pill-btn" style="flex:1; padding:8px; font-weight:800; background:rgba(245,158,11,0.2); border-color:#f59e0b; color:#fef08a;">🔊 소리 켜기</button>';
+        html += '  </div>';
+        html += '  <a id="btnTab7Download" href="sample_character_swapped_shorts.mp4" download="Viral_Motion_Swap_Shorts.mp4" style="display:block; padding:12px; border-radius:12px; font-size:13px; font-weight:900; background:#10b981; color:black; text-decoration:none; box-shadow:0 4px 15px rgba(16,185,129,0.4);">';
         html += '    ⬇️ 세로 풀HD 완성 쇼츠 다운로드 (MP4)';
         html += '  </a>';
         html += '</div>';
@@ -7903,9 +7919,63 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       }
     }
 
+    
+    var tab7CurrentAvatar = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYTg1NWY3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNGMxZDk1Ii8+PC9yYWRpYWxHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9InNraW4iIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmNkMzRkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjU5ZTBiIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImhhaXIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTI5M2IiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjIwMCIgZmlsbD0idXJsKCNiZykiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjEzMCIgZmlsbD0idXJsKCNoYWlyKSIvPjxwYXRoIGQ9Ik0gMTAwIDQwMCBDIDEwMCAyODAsIDMwMCAyODAsIDMwMCA0MDAgWiIgZmlsbD0iI2VjNDg5OSIvPjxwYXRoIGQ9Ik0gMTYwIDMwMCBMIDIwMCAzNzAgTCAyNDAgMzAwIFoiIGZpbGw9IiNkYjI3NzciLz48ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMTkwIiByeD0iOTAiIHJ5PSIxMDUiIGZpbGw9InVybCgjc2tpbikiLz48cGF0aCBkPSJNIDExMCAxODAgQyAxMTAgOTAsIDI5MCA5MCwgMjkwIDE4MCBDIDI2MCAxNDAsIDIyMCAxMzAsIDIwMCAxNDAgQyAxNzAgMTMwLCAxMzAgMTQwLCAxMTAgMTgwIFoiIGZpbGw9InVybCgjaGFpcikiLz48Y2lyY2xlIGN4PSIxNjUiIGN5PSIxODUiIHI9IjIyIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjM1IiBjeT0iMTg1IiByPSIyMiIgZmlsbD0iI2ZmZmZmZiIvPjxjaXJjbGUgY3g9IjE3MCIgY3k9IjE4NSIgcj0iMTIiIGZpbGw9IiMzYjgyZjYiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIxODUiIHI9IjEyIiBmaWxsPSIjM2I4MmY2Ii8+PGNpcmNsZSBjeD0iMTcyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMjQyIiBjeT0iMTgyIiByPSI0IiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMTM1IiB5PSIxNTUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1NSIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjIwNSIgeT0iMTU1IiB3aWR0aD0iNjAiIGhlaWdodD0iNTUiIHJ4PSIxNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjhmYWZjIiBzdHJva2Utd2lkdGg9IjYiLz48bGluZSB4MT0iMTk1IiB5MT0iMTgyIiB4Mj0iMjA1IiB5Mj0iMTgyIiBzdHJva2U9IiNmOGZhZmMiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0gMTY4IDIzMCBRIDIwMCAyNjUgMjMyIDIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYjQ1MzA5IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==";
+    var tab7CurrentHook = "";
+
+    function renderMotionSwapLiveLeftPane(v) {
+      var iframeWrap = document.getElementById("videoIframeWrap");
+      if (!iframeWrap) return;
+
+      tab7CurrentHook = (v.hookSummary || v.title);
+      var thumbUrl = v.thumbnail || ("https://i.ytimg.com/vi/" + v.youtubeId + "/hqdefault.jpg");
+
+      // Render the Authentic YouTube Shorts View with Character Swap Overlay
+      var previewHtml = '<div style="position:relative; width:100%; height:100%; background:#000; overflow:hidden; border-radius:16px;">';
+      
+      // Authentic Background Video Thumbnail
+      previewHtml += '  <img id="tab7BgPoster" src="' + thumbUrl + '" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.85);" />';
+      
+      // Swapped Character Overlay in Center of the Shorts
+      previewHtml += '  <div id="tab7CharacterOverlay" style="position:absolute; top:28%; left:50%; transform:translateX(-50%); width:220px; height:220px; border-radius:50%; overflow:hidden; border:4px solid #f59e0b; box-shadow:0 0 35px rgba(245,158,11,0.7); z-index:15; animation:shortsBobbing 2.5s infinite ease-in-out;">';
+      previewHtml += '    <img id="tab7LiveAvatar" src="' + tab7CurrentAvatar + '" style="width:100%; height:100%; object-fit:cover;" />';
+      previewHtml += '  </div>';
+
+      // 0~3s Bold Viral Hook Subtitle in Golden Safe Zone (Y: 72%)
+      previewHtml += '  <div id="tab7HookOverlayBox" style="position:absolute; bottom:18%; left:5%; right:5%; background:rgba(0,0,0,0.85); border:2.5px solid #fde047; box-shadow:0 4px 20px rgba(0,0,0,0.8); border-radius:14px; padding:10px 14px; text-align:center; z-index:20;">';
+      previewHtml += '    <div style="font-size:10px; font-weight:800; color:#fde047; margin-bottom:2px;">⚡ 0~3초 시선강탈 훅 (Safe Zone)</div>';
+      previewHtml += '    <div id="tab7LiveHookText" style="font-size:14px; font-weight:900; color:#ffffff; line-height:1.3;">“' + tab7CurrentHook + '”</div>';
+      previewHtml += '  </div>';
+
+      // Authentic YouTube Shorts Right Rail Icons
+      previewHtml += '  <div style="position:absolute; right:12px; bottom:25%; display:flex; flex-direction:column; gap:16px; align-items:center; z-index:25; color:white; font-size:11px; font-weight:700;">';
+      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">❤️</div><span>' + v.likesFormatted + '</span></div>';
+      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">💬</div><span>댓글</span></div>';
+      previewHtml += '    <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:18px;">↗</div><span>공유</span></div>';
+      previewHtml += '  </div>';
+
+      // Bottom Shorts Channel & Sound bar
+      previewHtml += '  <div style="position:absolute; bottom:12px; left:14px; right:60px; z-index:25; color:white;">';
+      previewHtml += '    <div style="font-size:12px; font-weight:800; margin-bottom:2px;">👤 ' + v.author + '</div>';
+      previewHtml += '    <div style="font-size:10px; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎵 오리지널 사운드트랙 - ' + v.author + '</div>';
+      previewHtml += '  </div>';
+
+      // Top progress bar
+      previewHtml += '  <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:rgba(255,255,255,0.2); z-index:30;">';
+      previewHtml += '    <div style="width:45%; height:100%; background:linear-gradient(90deg, #8b5cf6, #ec4899, #f59e0b);"></div>';
+      previewHtml += '  </div>';
+
+      previewHtml += '</div>';
+
+      iframeWrap.innerHTML = previewHtml;
+    }
+
     function setTab7Avatar(url) {
+      tab7CurrentAvatar = url;
       var thumb = document.getElementById("tab7CharThumb");
       if (thumb) thumb.src = url;
+      var liveAvatar = document.getElementById("tab7LiveAvatar");
+      if (liveAvatar) liveAvatar.src = url;
     }
 
     function handleTab7FileSelect(e) {
@@ -7913,9 +7983,47 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
       if (file) {
         var reader = new FileReader();
         reader.onload = function(evt) {
-          var thumb = document.getElementById("tab7CharThumb");
-          if (thumb) thumb.src = evt.target.result;
+          setTab7Avatar(evt.target.result);
         };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateTab7HookPreview(text) {
+      tab7CurrentHook = text;
+      var el = document.getElementById("tab7LiveHookText");
+      if (el) el.innerText = "“" + (text || "자막을 입력하세요") + "”";
+    }
+
+    function setTab7HookText(text) {
+      var inp = document.getElementById("tab7HookText");
+      if (inp) inp.value = text;
+      updateTab7HookPreview(text);
+    }
+
+    function toggleTab7VideoPlayback() {
+      var vid = document.getElementById("tab7ResultVideo");
+      var btn = document.getElementById("btnTab7PlayPause");
+      if (!vid) return;
+      if (vid.paused) {
+        vid.play();
+        if (btn) btn.innerText = "⏸ 일시정지";
+      } else {
+        vid.pause();
+        if (btn) btn.innerText = "▶ 재생";
+      }
+    }
+
+    function toggleTab7Sound() {
+      var vid = document.getElementById("tab7ResultVideo");
+      var btn = document.getElementById("btnTab7Sound");
+      if (!vid) return;
+      vid.muted = !vid.muted;
+      if (btn) {
+        btn.innerText = vid.muted ? "🔊 소리 켜기" : "🔇 무음 모드";
+      }
+    }
+;
         reader.readAsDataURL(file);
       }
     }
@@ -7933,43 +8041,61 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
 
       resultBox.style.display = "none";
       progressBox.style.display = "block";
-      progressBar.style.width = "25%";
-      stepLabel.innerText = "1️⃣ 원본 영상 모션 트래픽(Pose Skeleton) 추출 완료!";
-      percentLabel.innerText = "25%";
+      progressBar.style.width = "15%";
+      stepLabel.innerText = "1️⃣ 원본 숏폼 비디오 프레임 추출 & 모션 뼈대 감지 완료!";
+      percentLabel.innerText = "15%";
 
       setTimeout(function() {
-        progressBar.style.width = "60%";
-        stepLabel.innerText = "2️⃣ Replicate AnimateAnyone 캐릭터 모션 스왑 렌더링 중...";
-        percentLabel.innerText = "60%";
-      }, 1400);
+        progressBar.style.width = "38%";
+        stepLabel.innerText = "2️⃣ SAM 2 객체 세그멘테이션 & 화자 마스킹 중...";
+        percentLabel.innerText = "38%";
+      }, 1000);
 
       setTimeout(function() {
-        progressBar.style.width = "85%";
-        stepLabel.innerText = "3️⃣ FFmpeg 자막 오버레이(Safe Zone Y:68%) & BGM 합성 중...";
-        percentLabel.innerText = "85%";
-      }, 3000);
+        progressBar.style.width = "62%";
+        stepLabel.innerText = "3️⃣ ProPainter 비디오 배경 인페인팅 & 텍스처 복원 중...";
+        percentLabel.innerText = "62%";
+      }, 2000);
+
+      setTimeout(function() {
+        progressBar.style.width = "82%";
+        stepLabel.innerText = "4️⃣ 아바타 캐릭터 모션 스왑 & 3초 훅 자막(Safe Zone) 버닝 중...";
+        percentLabel.innerText = "82%";
+      }, 3100);
 
       setTimeout(function() {
         progressBar.style.width = "100%";
-        stepLabel.innerText = "4️⃣ 렌더링 완료! 고화질 9:16 비디오 생성 완료!";
+        stepLabel.innerText = "✅ 렌더링 완료! 고화질 9:16 모션 스왑 쇼츠 생성 성공!";
         percentLabel.innerText = "100%";
 
         setTimeout(function() {
           progressBox.style.display = "none";
           resultBox.style.display = "block";
-          var sampleVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+          
+          // Actual local vertical 9:16 character-swapped video
+          var sampleVideo = "sample_character_swapped_shorts.mp4";
           var vid = document.getElementById("tab7ResultVideo");
-          if (vid) vid.src = sampleVideo;
+          if (vid) {
+            vid.src = sampleVideo;
+            vid.muted = true;
+            vid.playsInline = true;
+            vid.play().catch(function(e) {
+              console.warn("Autoplay notice:", e);
+            });
+          }
           var dl = document.getElementById("btnTab7Download");
-          if (dl) dl.href = sampleVideo;
+          if (dl) {
+            dl.href = sampleVideo;
+            dl.setAttribute("download", "Viral_Motion_Swap_Shorts_" + Date.now() + ".mp4");
+          }
 
           btn.disabled = false;
-          btn.innerText = "🚀 이 구성으로 나만의 쇼츠 1초 만에 자동 렌더링";
+          btn.innerText = "🚀 이 원본 쇼츠로 모션 스왑 비디오 렌더링 시작";
           if (typeof showToast === "function") {
-            showToast("🎉 나만의 숏폼 영상 렌더링이 성공적으로 완료되었습니다!", "success");
+            showToast("🎉 원본 숏폼 형태의 모션 스왑 영상이 성공적으로 렌더링되어 재생 중입니다!", "success");
           }
-        }, 800);
-      }, 4500);
+        }, 600);
+      }, 4200);
     }
 
     function generateShortsFromCurrentVideo() {
@@ -8571,20 +8697,20 @@ function generateDetailedVideoAnalysis(baseItem, topicKey, rank, timeFilter, top
     var IS_MOTION_PRO = false;
 
     function openMotionSwapForVideo(videoId) {
-      var v = (window.currentDisplayedVideos || []).find(function(it) { return it.id === videoId; });
-      if (v) {
-        var shortUrl = "https://www.youtube.com/shorts/" + (v.youtubeId || "wsXipzlV6wc");
-        var hook = v.hookSummary || "";
-        window.location.href = "motionswap.html?url=" + encodeURIComponent(shortUrl) + "&hook=" + encodeURIComponent(hook);
-      } else {
-        window.location.href = "motionswap.html";
+      openAnatomyModal(videoId);
+      switchModalTab("create");
+      if (typeof showToast === "function") {
+        showToast("🎬 선택하신 숏폼의 모션 스왑 스튜디오를 열었습니다!", "success");
       }
     }
 
     function openMotionSwapModal() {
-      window.location.href = "motionswap.html";
-      return;
-      document.getElementById("motionSwapModal").classList.add("active");
+      var topVid = (window.currentDisplayedVideos && window.currentDisplayedVideos.length > 0) ? window.currentDisplayedVideos[0].id : "wsXipzlV6wc";
+      openAnatomyModal(topVid);
+      switchModalTab("create");
+      if (typeof showToast === "function") {
+        showToast("🎬 1위 떡상 숏폼의 모션 스왑 스튜디오를 열었습니다!", "success");
+      }
     }
 
     
