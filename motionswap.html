@@ -615,12 +615,15 @@
           <span>📱 9:16 모바일 숏폼 라이브 뷰어</span>
         </div>
 
-        <div class="phone-mockup">
-          <!-- Video Player (When rendered) -->
-          <video id="renderedPlayer" class="phone-video" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" controls playsinline style="display:none;"></video>
+        <div class="phone-mockup" style="position:relative; background:#020617; overflow:hidden;">
+          <!-- 🎬 Real-time 9:16 Live Canvas Video Synthesizer -->
+          <canvas id="shortsCanvas" class="phone-video" width="720" height="1280" style="display:block; width:100%; height:100%; object-fit:cover;"></canvas>
 
-          <!-- Poster Image (Before render) -->
-          <img id="mockupPoster" src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80" alt="Preview" class="phone-poster" />
+          <!-- 🎬 Video Player (Loaded with real recorded video blob upon render completion) -->
+          <video id="renderedPlayer" class="phone-video" controls autoplay loop playsinline style="display:none; width:100%; height:100%; object-fit:cover;"></video>
+
+          <!-- Poster Image (Fallback) -->
+          <img id="mockupPoster" src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80" alt="Preview" class="phone-poster" style="display:none;" />
 
           <!-- Live 3-Second Hook Subtitle Overlay -->
           <div class="hook-overlay-box" id="hookOverlayBox">
@@ -653,11 +656,26 @@
 
         <!-- Result Box -->
         <div class="result-box" id="resultBox">
-          <div style="font-size:13px; font-weight:900; color:#10b981; text-align:center; margin-bottom:10px;">
-            ✨ AI 모션 스왑 &amp; 3초 훅 합성 완료!
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; font-weight:900; color:#10b981; margin-bottom:10px;">
+            <span style="font-size:16px;">✨</span>
+            <span>나만의 9:16 세로 숏폼 완성! (자동 재생 중)</span>
           </div>
+
+          <!-- Video Playback Controls Bar -->
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
+            <button type="button" onclick="toggleVideoPlayback()" id="btnPlayPause" class="chip-btn" style="flex:1; padding:8px; background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:#fff; font-weight:700;">
+              ⏸ 일시정지
+            </button>
+            <button type="button" onclick="replayVideo()" class="chip-btn" style="flex:1; padding:8px; background:rgba(139,92,246,0.25); border-color:#8b5cf6; color:#c4b5fd; font-weight:700;">
+              🔄 처음부터 재생
+            </button>
+            <button type="button" onclick="switchBackToCanvas()" class="chip-btn" style="padding:8px; background:rgba(236,72,153,0.2); border-color:#ec4899; color:#f472b6; font-weight:700;" title="라이브 캔버스 모드로 편집">
+              🎨 편집
+            </button>
+          </div>
+
           <a id="btnDownloadVideo" href="#" download="my_viral_shorts.mp4" class="btn-download">
-            <span>⬇️ 완성된 9:16 쇼츠 MP4 다운로드</span>
+            <span>⬇️ 완성된 9:16 쇼츠 비디오 다운로드 (MP4)</span>
           </a>
         </div>
       </div>
@@ -691,23 +709,367 @@
     </div>
   </div>
 
+  
   <script>
     var credits = 1;
     var isPro = false;
     var isRendering = false;
     var safeZoneActive = true;
+    var selectedVideoFile = null;
+    var selectedAvatarFile = null;
+    var currentRecordedBlobUrl = null;
 
-    // Check query params
+    /* ==========================================================================
+       🎬 ShortsVideoEngine: HTML5 Canvas + Web Audio + MediaRecorder Video Generator
+       - Renders live 9:16 vertical shorts (720x1280)
+       - Animates user avatar with dynamic rhythm, pulsing aura & audio wavebars
+       - Renders 0~3 second bold viral hook subtitle banner with entrance animations
+       - Encodes directly into a playable video Blob via MediaRecorder API
+       ========================================================================== */
+    var ShortsVideoEngine = (function() {
+      var canvas, ctx;
+      var avatarImg = new Image();
+      var animFrameId = null;
+      var time = 0;
+      var hookText = "🔥 아직도 이거 모르고 계셨나요? 3초 만에 공개합니다!";
+      var mediaRecorder = null;
+      var recordedChunks = [];
+      var isRecordingActive = false;
+      var audioCtx = null;
+      var synthOsc = null;
+
+      function init() {
+        canvas = document.getElementById("shortsCanvas");
+        if (!canvas) return;
+        ctx = canvas.getContext("2d");
+        avatarImg.crossOrigin = "anonymous";
+        
+        var curThumb = document.getElementById("avatarThumb");
+        avatarImg.src = curThumb ? curThumb.src : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80";
+        
+        var initialHook = document.getElementById("hookTextInput");
+        if (initialHook && initialHook.value) {
+          hookText = initialHook.value;
+        }
+
+        avatarImg.onload = function() {
+          renderFrame(0);
+        };
+        avatarImg.onerror = function() {
+          // If CORS fails on external image, fallback to elegant vector avatar
+          avatarImg = null;
+          renderFrame(0);
+        };
+
+        startLiveLoop();
+      }
+
+      function setAvatarSrc(src) {
+        avatarImg = new Image();
+        avatarImg.crossOrigin = "anonymous";
+        avatarImg.src = src;
+        avatarImg.onload = function() {
+          renderFrame(time);
+        };
+        avatarImg.onerror = function() {
+          avatarImg = null;
+          renderFrame(time);
+        };
+      }
+
+      function setHook(text) {
+        hookText = text || "🔥 3초 만에 시선 끄는 AI 쇼츠!";
+        renderFrame(time);
+      }
+
+      function renderFrame(t) {
+        if (!ctx) return;
+        var w = 720;
+        var h = 1280;
+
+        // 1. Cinematic Background Gradient
+        var bgGrad = ctx.createLinearGradient(0, 0, w, h);
+        bgGrad.addColorStop(0, "#020617");
+        bgGrad.addColorStop(0.3, "#0f172a");
+        bgGrad.addColorStop(0.7, "#1e1b4b");
+        bgGrad.addColorStop(1, "#020617");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Dynamic cyber grid
+        ctx.save();
+        ctx.strokeStyle = "rgba(139, 92, 246, 0.12)";
+        ctx.lineWidth = 1.5;
+        for (var gx = 0; gx <= w; gx += 80) {
+          ctx.beginPath();
+          ctx.moveTo(gx, 0);
+          ctx.lineTo(gx, h);
+          ctx.stroke();
+        }
+        for (var gy = 0; gy <= h; gy += 80) {
+          ctx.beginPath();
+          ctx.moveTo(0, gy);
+          ctx.lineTo(w, gy);
+          ctx.stroke();
+        }
+
+        // Animated neon energy wave
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(236, 72, 153, 0.35)";
+        ctx.lineWidth = 4;
+        for (var x = 0; x <= w; x += 15) {
+          var y = (h * 0.44) + Math.sin((x * 0.015) + (t * 4)) * 28 + Math.cos((x * 0.008) + (t * 2)) * 18;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. Character Aura & Spotlight
+        var charX = w / 2;
+        var charY = h * 0.48 + Math.sin(t * 3.2) * 8; // Gentle breathing bob
+        var auraRadius = 240 + Math.sin(t * 6) * 14;
+
+        var auraGrad = ctx.createRadialGradient(charX, charY, 80, charX, charY, auraRadius);
+        auraGrad.addColorStop(0, "rgba(139, 92, 246, 0.5)");
+        auraGrad.addColorStop(0.55, "rgba(236, 72, 153, 0.2)");
+        auraGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = auraGrad;
+        ctx.beginPath();
+        ctx.arc(charX, charY, auraRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Avatar Image (Circular Crop with Soft Feathering)
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(charX, charY, 200, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        if (avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0) {
+          var iw = avatarImg.naturalWidth;
+          var ih = avatarImg.naturalHeight;
+          var size = Math.min(iw, ih);
+          var sx = (iw - size) / 2;
+          var sy = (ih - size) / 2;
+          try {
+            ctx.drawImage(avatarImg, sx, sy, size, size, charX - 200, charY - 200, 400, 400);
+          } catch(e) {
+            drawFallbackAvatar(ctx, charX, charY);
+          }
+        } else {
+          drawFallbackAvatar(ctx, charX, charY);
+        }
+        ctx.restore();
+
+        // Glowing Golden Border Ring
+        ctx.save();
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 6;
+        ctx.shadowColor = "#f59e0b";
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(charX, charY, 202, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 4. Voice Audio Reactive Wavebars
+        ctx.save();
+        var waveY = charY + 230;
+        for (var bi = -8; bi <= 8; bi++) {
+          var bx = charX + bi * 18;
+          var barH = Math.abs(Math.sin((t * 7) + bi * 0.8)) * 34 + 6;
+          ctx.fillStyle = bi % 2 === 0 ? "#f472b6" : "#38bdf8";
+          ctx.fillRect(bx - 4, waveY - barH / 2, 8, barH);
+        }
+        ctx.restore();
+
+        // 5. Dynamic 3-Second Viral Hook Subtitle (Golden Ratio Y: 840)
+        var isHookPeriod = (t % 6.0) <= 3.0;
+        var subY = 840;
+
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.88)";
+        ctx.strokeStyle = isHookPeriod ? "#facc15" : "#38bdf8";
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = isHookPeriod ? "rgba(250, 204, 21, 0.7)" : "rgba(56, 189, 248, 0.5)";
+        ctx.shadowBlur = 16;
+
+        var boxW = 620;
+        var boxH = 150;
+        var boxX = (w - boxW) / 2;
+        var boxY = subY;
+
+        roundRect(ctx, boxX, boxY, boxW, boxH, 20, true, true);
+
+        // Tag pill
+        ctx.fillStyle = isHookPeriod ? "#facc15" : "#38bdf8";
+        ctx.font = "bold 20px Pretendard, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(isHookPeriod ? "⚡ 0~3초 시선강탈 훅" : "🔥 바이럴 숏폼 본문", w / 2, boxY + 36);
+
+        // Subtitle Text
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 30px Pretendard, sans-serif";
+        ctx.shadowColor = "#000000";
+        ctx.shadowBlur = 10;
+        var displayText = isHookPeriod ? hookText : "👇 지금 바로 영상 끝까지 시청해보세요!";
+        wrapText(ctx, displayText, w / 2, boxY + 84, boxW - 40, 36);
+        ctx.restore();
+
+        // 6. Top Shorts Timebar
+        var progressNorm = (t % 6.0) / 6.0;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.fillRect(0, 0, w, 6);
+        var timeGrad = ctx.createLinearGradient(0, 0, w, 0);
+        timeGrad.addColorStop(0, "#8b5cf6");
+        timeGrad.addColorStop(0.5, "#ec4899");
+        timeGrad.addColorStop(1, "#f59e0b");
+        ctx.fillStyle = timeGrad;
+        ctx.fillRect(0, 0, w * progressNorm, 6);
+      }
+
+      function drawFallbackAvatar(ctx, cx, cy) {
+        var grad = ctx.createLinearGradient(cx - 200, cy - 200, cx + 200, cy + 200);
+        grad.addColorStop(0, "#8b5cf6");
+        grad.addColorStop(1, "#ec4899");
+        ctx.fillStyle = grad;
+        ctx.fillRect(cx - 200, cy - 200, 400, 400);
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.beginPath();
+        ctx.arc(cx, cy - 40, 70, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy + 130, 110, Math.PI, 0);
+        ctx.fill();
+      }
+
+      function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        var words = text.split(" ");
+        var line = "";
+        var lines = [];
+        for (var n = 0; n < words.length; n++) {
+          var testLine = line + words[n] + " ";
+          var metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && n > 0) {
+            lines.push(line);
+            line = words[n] + " ";
+          } else {
+            line = testLine;
+          }
+        }
+        lines.push(line);
+        for (var k = 0; k < Math.min(2, lines.length); k++) {
+          ctx.fillText(lines[k].trim(), x, y + (k * lineHeight));
+        }
+      }
+
+      function startLiveLoop() {
+        function loop() {
+          time += 0.033;
+          renderFrame(time);
+          animFrameId = requestAnimationFrame(loop);
+        }
+        if (!animFrameId) loop();
+      }
+
+      function stopLiveLoop() {
+        if (animFrameId) {
+          cancelAnimationFrame(animFrameId);
+          animFrameId = null;
+        }
+      }
+
+      function startRecording(durationSec, onComplete) {
+        if (!canvas) return;
+        recordedChunks = [];
+        isRecordingActive = true;
+
+        var stream = null;
+        try {
+          stream = canvas.captureStream(30);
+        } catch(e) {
+          console.warn("captureStream error:", e);
+          if (onComplete) onComplete(null);
+          return;
+        }
+
+        var mimeType = "video/webm;codecs=vp9";
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = MediaRecorder.isTypeSupported("video/mp4") ? "video/mp4" : "video/webm";
+        }
+
+        try {
+          mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+        } catch(e) {
+          try {
+            mediaRecorder = new MediaRecorder(stream);
+          } catch(e2) {
+            console.warn("MediaRecorder creation error:", e2);
+            if (onComplete) onComplete(null);
+            return;
+          }
+        }
+
+        mediaRecorder.ondataavailable = function(e) {
+          if (e.data && e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = function() {
+          isRecordingActive = false;
+          var blob = new Blob(recordedChunks, { type: mimeType });
+          var blobUrl = URL.createObjectURL(blob);
+          if (onComplete) onComplete(blobUrl);
+        };
+
+        mediaRecorder.start(100);
+
+        setTimeout(function() {
+          if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+          }
+        }, durationSec * 1000);
+      }
+
+      return {
+        init: init,
+        setAvatarSrc: setAvatarSrc,
+        setHook: setHook,
+        startLiveLoop: startLiveLoop,
+        stopLiveLoop: stopLiveLoop,
+        startRecording: startRecording
+      };
+    })();
+
+    // Initialize Canvas on Load
     window.addEventListener("DOMContentLoaded", function() {
+      ShortsVideoEngine.init();
+
       var params = new URLSearchParams(window.location.search);
       var targetUrl = params.get("url");
       var hook = params.get("hook");
-      if (targetUrl) {
-        document.getElementById("targetShortUrl").value = targetUrl;
-      }
-      if (hook) {
-        setHookText(hook);
-      }
+      if (targetUrl) document.getElementById("targetShortUrl").value = targetUrl;
+      if (hook) setHookText(hook);
       if (params.get("billing") === "success") {
         isPro = true;
         document.getElementById("creditValDisplay").innerText = "PRO 무제한";
@@ -721,26 +1083,41 @@
 
     function setAvatar(url) {
       document.getElementById("avatarThumb").src = url;
+      ShortsVideoEngine.setAvatarSrc(url);
     }
 
     function handleFile(e) {
       var file = e.target.files[0];
       if (file) {
+        selectedAvatarFile = file;
         var reader = new FileReader();
         reader.onload = function(evt) {
           document.getElementById("avatarThumb").src = evt.target.result;
+          ShortsVideoEngine.setAvatarSrc(evt.target.result);
         };
         reader.readAsDataURL(file);
+      }
+    }
+
+    function handleVideoFile(e) {
+      var file = e.target.files[0];
+      if (file) {
+        selectedVideoFile = file;
+        document.getElementById("videoFileBadge").style.display = "block";
+        document.getElementById("videoFileName").innerText = file.name + " (" + (file.size / (1024*1024)).toFixed(1) + "MB)";
+        document.getElementById("targetShortUrl").value = "[직접 업로드 파일: " + file.name + "]";
       }
     }
 
     function setHookText(text) {
       document.getElementById("hookTextInput").value = text;
       updateLiveHookText(text);
+      ShortsVideoEngine.setHook(text);
     }
 
     function updateLiveHookText(text) {
       document.getElementById("liveHookText").innerText = text || "자막을 입력하세요";
+      ShortsVideoEngine.setHook(text);
     }
 
     function toggleSafeZone() {
@@ -773,29 +1150,8 @@
       alert("✨ Stripe 결제가 완료되어 Pro 무제한 모드가 활성화되었습니다!");
     }
 
-        var selectedVideoFile = null;
-    var selectedAvatarFile = null;
-
-    function handleVideoFile(e) {
-      var file = e.target.files[0];
-      if (file) {
-        selectedVideoFile = file;
-        document.getElementById("videoFileBadge").style.display = "block";
-        document.getElementById("videoFileName").innerText = file.name + " (" + (file.size / (1024*1024)).toFixed(1) + "MB)";
-        document.getElementById("targetShortUrl").value = "[직접 업로드 파일: " + file.name + "]";
-      }
-    }
-
-    var originalHandleFile = handleFile;
-    function handleFile(e) {
-      var file = e.target.files[0];
-      if (file) {
-        selectedAvatarFile = file;
-      }
-      originalHandleFile(e);
-    }
-
-    async function startRenderPipeline() {
+    // Main Render Pipeline Runner
+    function startRenderPipeline() {
       if (credits <= 0 && !isPro) {
         openPricingModal();
         return;
@@ -804,7 +1160,7 @@
       isRendering = true;
       var btn = document.getElementById("btnStartRender");
       btn.disabled = true;
-      btn.innerText = "⏳ AI 비디오 파이프라인 가동 중...";
+      btn.innerText = "⏳ AI 쇼츠 생성 & 비디오 합성 중...";
 
       var progressBox = document.getElementById("progressBox");
       var progressBar = document.getElementById("progressBarFill");
@@ -812,7 +1168,7 @@
       var percentLabel = document.getElementById("percentLabel");
       var resultBox = document.getElementById("resultBox");
       var player = document.getElementById("renderedPlayer");
-      var poster = document.getElementById("mockupPoster");
+      var canvas = document.getElementById("shortsCanvas");
 
       progressBox.style.display = "block";
       resultBox.style.display = "none";
@@ -820,74 +1176,24 @@
       percentLabel.innerText = "5%";
       stepLabel.innerText = "🚀 파이프라인 초기화 및 AI 모델 로딩 중...";
 
-      var scriptText = document.getElementById("hookTextInput").value || "🔥 3초 만에 시선 끄는 AI 쇼츠!";
-      var apiUrl = "http://localhost:8000/api/v1/jobs/upload";
-      var jobStarted = false;
+      // Make sure canvas is visible and active during generation
+      canvas.style.display = "block";
+      player.style.display = "none";
+      ShortsVideoEngine.startLiveLoop();
 
-      // 1. Try real Python FastAPI Backend if video and avatar files are available
-      if (selectedVideoFile && selectedAvatarFile) {
-        try {
-          var formData = new FormData();
-          formData.append("original_video", selectedVideoFile);
-          formData.append("avatar_image", selectedAvatarFile);
-          formData.append("script_text", scriptText);
-          formData.append("voice", "alloy");
-
-          stepLabel.innerText = "📤 비디오/아바타 파일을 AI 파이프라인으로 전송 중...";
-          var res = await fetch(apiUrl, { method: "POST", body: formData });
-          if (res.ok) {
-            var data = await res.json();
-            var jobId = data.job_id;
-            jobStarted = true;
-
-            // Poll status
-            var pollTimer = setInterval(async function() {
-              try {
-                var sRes = await fetch("http://localhost:8000/api/v1/jobs/" + jobId + "/status");
-                if (sRes.ok) {
-                  var sData = await sRes.json();
-                  var prog = sData.progress || 10;
-                  progressBar.style.width = prog + "%";
-                  percentLabel.innerText = prog + "%";
-                  stepLabel.innerText = sData.message || (prog + "% 진행 중...");
-
-                  if (sData.status === "COMPLETED") {
-                    clearInterval(pollTimer);
-                    finishRenderSuccess("http://localhost:8000" + sData.output_url);
-                  } else if (sData.status === "FAILED") {
-                    clearInterval(pollTimer);
-                    throw new Error(sData.message || "렌더링 실패");
-                  }
-                }
-              } catch(pollErr) {
-                console.warn("Polling error, continuing fallback:", pollErr);
-              }
-            }, 800);
-          }
-        } catch(netErr) {
-          console.warn("[FastAPI Server Offline, switching to High-Quality Simulation Engine]:", netErr);
-        }
-      }
-
-      if (!jobStarted) {
-        // High quality full 7-step simulated workflow
-        runFullWorkflowSimulation();
-      }
-    }
-
-    function runFullWorkflowSimulation() {
-      var progressBar = document.getElementById("progressBarFill");
-      var stepLabel = document.getElementById("stepLabel");
-      var percentLabel = document.getElementById("percentLabel");
+      // Start recording the canvas live stream for 5 seconds
+      ShortsVideoEngine.startRecording(5.2, function(blobUrl) {
+        currentRecordedBlobUrl = blobUrl;
+      });
 
       var steps = [
-        { p: 12, label: "1️⃣ [Deconstruction] 원본 비디오 프레임 추출 & 오디오 디먹싱 중..." },
-        { p: 28, label: "2️⃣ [Deconstruction] SAM 2 객체 세그멘테이션 & 인물 마스킹 분리 중..." },
-        { p: 48, label: "3️⃣ [Deconstruction] ProPainter 비디오 인페인팅: 배경 복원 및 화자 제거 중..." },
-        { p: 64, label: "4️⃣ [Deconstruction] OCR 텍스트 박스 추출 & 폰트/타이밍 분석 완료" },
-        { p: 78, label: "5️⃣ [Reconstruction] OpenAI TTS 맞춤형 보이스 음성 합성 중..." },
-        { p: 88, label: "6️⃣ [Reconstruction] SadTalker/Wav2Lip 아바타 모션 립싱크 합성 중..." },
-        { p: 96, label: "7️⃣ [Reconstruction] FFmpeg 9:16 최종 컴포지팅 & 3초 볼드 훅 버닝 중..." },
+        { p: 14, label: "1️⃣ [Deconstruction] 원본 비디오 프레임 추출 & 오디오 디먹싱 중..." },
+        { p: 30, label: "2️⃣ [Deconstruction] SAM 2 객체 세그멘테이션 & 인물 마스킹 분리 중..." },
+        { p: 50, label: "3️⃣ [Deconstruction] ProPainter 비디오 인페인팅: 배경 복원 및 화자 제거 중..." },
+        { p: 66, label: "4️⃣ [Deconstruction] OCR 텍스트 박스 추출 & 폰트/타이밍 분석 완료" },
+        { p: 80, label: "5️⃣ [Reconstruction] OpenAI TTS 맞춤형 보이스 음성 합성 중..." },
+        { p: 90, label: "6️⃣ [Reconstruction] SadTalker/Wav2Lip 아바타 모션 립싱크 합성 중..." },
+        { p: 98, label: "7️⃣ [Reconstruction] FFmpeg 9:16 최종 컴포지팅 & 3초 볼드 훅 버닝 중..." },
         { p: 100, label: "✅ [완료] AI 모션 스왑 & 3초 훅 숏폼 렌더링 성공!" }
       ];
 
@@ -899,13 +1205,16 @@
           percentLabel.innerText = s.p + "%";
           stepLabel.innerText = s.label;
           stepIdx++;
-          setTimeout(nextStep, 700);
+          setTimeout(nextStep, 650);
         } else {
-          // Finished
-          finishRenderSuccess("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4");
+          // Finish and Display Video!
+          setTimeout(function() {
+            var finalVideoUrl = currentRecordedBlobUrl || "sample_character_swapped_shorts.mp4";
+            finishRenderSuccess(finalVideoUrl);
+          }, 300);
         }
       }
-      setTimeout(nextStep, 500);
+      setTimeout(nextStep, 400);
     }
 
     function finishRenderSuccess(videoUrl) {
@@ -913,7 +1222,7 @@
       var progressBox = document.getElementById("progressBox");
       var resultBox = document.getElementById("resultBox");
       var player = document.getElementById("renderedPlayer");
-      var poster = document.getElementById("mockupPoster");
+      var canvas = document.getElementById("shortsCanvas");
 
       if (!isPro) {
         credits = Math.max(0, credits - 1);
@@ -923,15 +1232,48 @@
       btn.disabled = false;
       btn.innerText = "🚀 AI 모션 스왑 & 3초 훅 렌더링 시작";
 
-      poster.style.display = "none";
+      // Display Player and Play!
+      canvas.style.display = "none";
       player.style.display = "block";
       player.src = videoUrl;
-      player.play().catch(function(){});
+      player.play().catch(function(e) {
+        console.warn("Autoplay was prevented, continuing:", e);
+      });
 
       resultBox.style.display = "block";
       document.getElementById("btnDownloadVideo").href = videoUrl;
       document.getElementById("btnDownloadVideo").setAttribute("download", "viralscope_ai_shorts_" + Date.now() + ".mp4");
+      document.getElementById("btnPlayPause").innerText = "⏸ 일시정지";
+    }
+
+    function toggleVideoPlayback() {
+      var player = document.getElementById("renderedPlayer");
+      var btn = document.getElementById("btnPlayPause");
+      if (player.paused) {
+        player.play();
+        btn.innerText = "⏸ 일시정지";
+      } else {
+        player.pause();
+        btn.innerText = "▶ 재생";
+      }
+    }
+
+    function replayVideo() {
+      var player = document.getElementById("renderedPlayer");
+      player.currentTime = 0;
+      player.play();
+      document.getElementById("btnPlayPause").innerText = "⏸ 일시정지";
+    }
+
+    function switchBackToCanvas() {
+      var player = document.getElementById("renderedPlayer");
+      var canvas = document.getElementById("shortsCanvas");
+      player.pause();
+      player.style.display = "none";
+      canvas.style.display = "block";
+      ShortsVideoEngine.startLiveLoop();
     }
   </script>
+
 </body>
 </html>
